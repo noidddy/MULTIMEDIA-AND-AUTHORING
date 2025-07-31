@@ -231,6 +231,35 @@
             margin-top: 1rem;
             display: none;
         }
+        
+        /* Blender download button styles */
+        .blend-download-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .blend-download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .blend-download-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
     </style>
 </head>
 <body class="min-h-screen text-white">
@@ -274,6 +303,12 @@
                     <p class="text-xl text-gray-300 mb-8">
                         Experience the complete journey through our solar system from the blazing Sun to the distant reaches of Pluto in this comprehensive visual showcase.
                     </p>
+                    <button class="blend-download-btn" onclick="downloadBlendFile('solarsystem')">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                        </svg>
+                        Download Complete Blender Project
+                    </button>
                 </div>
             </div>
         </section>
@@ -326,6 +361,12 @@
                                     <div class="text-gray-300 mb-2">Your age on Mercury:</div>
                                     <div class="age-number" id="mercury-age-display">Enter your age above</div>
                                 </div>
+                                <button class="blend-download-btn" onclick="downloadBlendFile('mercury')">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                    </svg>
+                                    Download Blender File
+                                </button>
                             </div>
                         </div>
                         <div class="lg:w-1/2">
@@ -366,6 +407,12 @@
                                     <div class="text-gray-300 mb-2">Your age on Venus:</div>
                                     <div class="age-number" id="venus-age-display">Enter your age above</div>
                                 </div>
+                                <button class="blend-download-btn" onclick="downloadBlendFile('venus')">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                    </svg>
+                                    Download Blender File
+                                </button>
                             </div>
                         </div>
                         <div class="lg:w-1/2">
@@ -406,6 +453,12 @@
                                     <div class="text-gray-300 mb-2">Your age on Earth:</div>
                                     <div class="age-number" id="earth-age-display">Enter your age above</div>
                                 </div>
+                                <button class="blend-download-btn" onclick="downloadBlendFile('earth')">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                    </svg>
+                                    Download Blender File
+                                </button>
                             </div>
                         </div>
                         <div class="lg:w-1/2">
@@ -446,6 +499,12 @@
                                     <div class="text-gray-300 mb-2">Your age on Mars:</div>
                                     <div class="age-number" id="mars-age-display">Enter your age above</div>
                                 </div>
+                                <button class="blend-download-btn" onclick="downloadBlendFile('mars')">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                    </svg>
+                                    Download Blender File
+                                </button>
                             </div>
                         </div>
                         <div class="lg:w-1/2">
@@ -486,6 +545,12 @@
                                     <div class="text-gray-300 mb-2">Your age on Jupiter:</div>
                                     <div class="age-number" id="jupiter-age-display">Enter your age above</div>
                                 </div>
+                                <button class="blend-download-btn" onclick="downloadBlendFile('jupiter')">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                    </svg>
+                                    Download Blender File
+                                </button>
                             </div>
                         </div>
                         <div class="lg:w-1/2">
@@ -526,6 +591,12 @@
                                     <div class="text-gray-300 mb-2">Your age on Saturn:</div>
                                     <div class="age-number" id="saturn-age-display">Enter your age above</div>
                                 </div>
+                                <button class="blend-download-btn" onclick="downloadBlendFile('saturn')">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                    </svg>
+                                    Download Blender File
+                                </button>
                             </div>
                         </div>
                         <div class="lg:w-1/2">
@@ -566,6 +637,12 @@
                                     <div class="text-gray-300 mb-2">Your age on Uranus:</div>
                                     <div class="age-number" id="uranus-age-display">Enter your age above</div>
                                 </div>
+                                <button class="blend-download-btn" onclick="downloadBlendFile('uranus')">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                    </svg>
+                                    Download Blender File
+                                </button>
                             </div>
                         </div>
                         <div class="lg:w-1/2">
@@ -606,6 +683,12 @@
                                     <div class="text-gray-300 mb-2">Your age on Neptune:</div>
                                     <div class="age-number" id="neptune-age-display">Enter your age above</div>
                                 </div>
+                                <button class="blend-download-btn" onclick="downloadBlendFile('neptune')">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                    </svg>
+                                    Download Blender File
+                                </button>
                             </div>
                         </div>
                         <div class="lg:w-1/2">
@@ -646,6 +729,12 @@
                                     <div class="text-gray-300 mb-2">Your age on Pluto:</div>
                                     <div class="age-number" id="pluto-age-display">Enter your age above</div>
                                 </div>
+                                <button class="blend-download-btn" onclick="downloadBlendFile('pluto')">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                    </svg>
+                                    Download Blender File
+                                </button>
                             </div>
                         </div>
                         <div class="lg:w-1/2">
@@ -855,6 +944,36 @@
                     summaryElement.textContent = `${age} years old`;
                 }
             }
+        }
+
+        // Blender file download function
+        function downloadBlendFile(planetName) {
+            // Map planet names to blend file names
+            const blendFiles = {
+                'mercury': 'mercury.blend',
+                'venus': 'venus.blend',
+                'earth': 'earth.blend',
+                'mars': 'mars.blend',
+                'jupiter': 'jupiter.blend',
+                'saturn': 'saturn.blend',
+                'uranus': 'uranus.blend',
+                'neptune': 'neptune.blend',
+                'pluto': 'pluto.blend',
+                'solarsystem': 'ROSARIO-SOLAR_SYSTEM.blend'
+            };
+
+            const fileName = blendFiles[planetName];
+            if (!fileName) return;
+
+            // Create a temporary link element
+            const link = document.createElement('a');
+            link.href = `blender_files/${fileName}`;
+            link.download = fileName;
+            
+            // Append to the document, trigger click, then remove
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 </body>
