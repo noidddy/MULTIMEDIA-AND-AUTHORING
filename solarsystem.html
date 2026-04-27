@@ -3,978 +3,549 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solar System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Solar System Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --nebula: #06D6A0;
+            --plasma: #EF476F;
+            --sun-c: #FFD166;
+            --deep: #020c13;
+            --void: #040f1a;
+            --dim: rgba(255,255,255,0.45);
+            --card: rgba(6,214,160,0.04);
+            --card-b: rgba(6,214,160,0.12);
+
+            /* Planet colors */
+            --mercury-c: #b0a090;
+            --venus-c:   #ff9800;
+            --earth-c:   #29b6f6;
+            --mars-c:    #ef5350;
+            --jupiter-c: #ff8a65;
+            --saturn-c:  #ffd166;
+            --uranus-c:  #00bcd4;
+            --neptune-c: #3f51b5;
+            --pluto-c:   #9e9e9e;
+        }
+
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior: smooth; }
+
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        }
-        
-        .video-container {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            border-radius: 20px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .video-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-        }
-        
-        .play-button {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .play-button:hover {
-            background: rgba(255, 255, 255, 1);
-            transform: translate(-50%, -50%) scale(1.1);
-        }
-        
-        .play-icon {
-            width: 0;
-            height: 0;
-            border-left: 20px solid #4f46e5;
-            border-top: 12px solid transparent;
-            border-bottom: 12px solid transparent;
-            margin-left: 4px;
-        }
-        
-        .progress-bar {
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #60a5fa, #3b82f6);
-            border-radius: 2px;
-            transition: width 0.3s ease;
-        }
-        
-        .timeline {
-            position: relative;
-            padding-left: 2rem;
-        }
-        
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: linear-gradient(to bottom, #60a5fa, #3b82f6);
-        }
-        
-        .timeline-item {
-            position: relative;
-            margin-bottom: 3rem;
-        }
-        
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -1.5rem;
-            top: 2rem;
-            width: 12px;
-            height: 12px;
-            background: #60a5fa;
-            border-radius: 50%;
-            border: 3px solid #1a1a2e;
-        }
-        
-        .timeline-item.completed::before {
-            background: #10b981;
-        }
-        
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 2rem;
-            transition: all 0.3s ease;
-        }
-        
-        .card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-2px);
-        }
-        
-        .planet-tag {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: 1rem;
-        }
-        
-        .tag-mercury { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
-        .tag-venus { background: rgba(255, 152, 0, 0.2); color: #ff9800; }
-        .tag-earth { background: rgba(33, 150, 243, 0.2); color: #2196f3; }
-        .tag-mars { background: rgba(244, 67, 54, 0.2); color: #f44336; }
-        .tag-jupiter { background: rgba(255, 87, 34, 0.2); color: #ff5722; }
-        .tag-saturn { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
-        .tag-uranus { background: rgba(0, 188, 212, 0.2); color: #00bcd4; }
-        .tag-neptune { background: rgba(63, 81, 181, 0.2); color: #3f51b5; }
-        .tag-pluto { background: rgba(158, 158, 158, 0.2); color: #9e9e9e; }
-        
-        .overview-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-        
-        .stat-item {
-            text-align: center;
-            padding: 1.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #60a5fa;
-        }
-        
-        .age-calculator {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .age-display {
-            background: rgba(96, 165, 250, 0.1);
-            border: 1px solid rgba(96, 165, 250, 0.3);
-            border-radius: 10px;
-            padding: 1rem;
-            margin-top: 1rem;
-            text-align: center;
-        }
-        
-        .age-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #60a5fa;
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--deep);
+            color: #fff;
+            overflow-x: hidden;
+            cursor: none;
         }
 
-        /* Video player styles */
-        .video-player {
-            width: 100%;
-            aspect-ratio: 16/9;
-            background: black;
-            display: none;
+        /* ── CURSOR ── */
+        .cursor { position:fixed; width:10px; height:10px; background:var(--nebula); border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); mix-blend-mode:screen; transition:transform .1s; }
+        .cursor-ring { position:fixed; width:32px; height:32px; border:1px solid rgba(6,214,160,.35); border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:left .11s ease,top .11s ease; }
+
+        /* ── STARS ── */
+        .starfield { position:fixed; inset:0; pointer-events:none; z-index:0; }
+        .star { position:absolute; background:#fff; border-radius:50%; animation:tw var(--d,4s) ease-in-out infinite var(--dl,0s); }
+        @keyframes tw { 0%,100%{opacity:var(--a,.2);transform:scale(1)} 50%{opacity:var(--b,.7);transform:scale(1.5)} }
+
+        /* ── SCANLINES ── */
+        body::after {
+            content:''; position:fixed; inset:0; pointer-events:none; z-index:1000;
+            background: repeating-linear-gradient(to bottom, transparent 0, transparent 3px, rgba(0,0,0,.03) 3px, rgba(0,0,0,.03) 4px);
         }
-        
+
+        /* ── NAV ── */
+        .nav {
+            position:fixed; top:0; left:0; right:0; z-index:500;
+            padding:16px 48px; display:flex; justify-content:space-between; align-items:center;
+            transition:background .4s, border-color .4s;
+            border-bottom: 1px solid transparent;
+        }
+        .nav.solid { background:rgba(2,12,19,.94); backdrop-filter:blur(20px); border-color:rgba(6,214,160,.1); }
+        .nav-logo { font-family:'Orbitron',sans-serif; font-size:.85rem; font-weight:700; letter-spacing:.25em; color:var(--nebula); text-transform:uppercase; text-decoration:none; }
+        .nav-right { display:flex; align-items:center; gap:32px; }
+        .nav-link { font-family:'Space Mono',monospace; font-size:.68rem; letter-spacing:.15em; color:var(--dim); text-decoration:none; text-transform:uppercase; transition:color .3s; }
+        .nav-link:hover { color:var(--nebula); }
+        .back-btn {
+            display:inline-flex; align-items:center; gap:8px;
+            font-family:'Space Mono',monospace; font-size:.68rem; letter-spacing:.15em; text-transform:uppercase;
+            color:var(--nebula); border:1px solid var(--nebula); padding:9px 22px;
+            text-decoration:none; transition:all .3s; position:relative; overflow:hidden;
+        }
+        .back-btn::before { content:''; position:absolute; inset:0; background:var(--nebula); transform:scaleX(0); transform-origin:right; transition:transform .35s ease; }
+        .back-btn:hover::before { transform:scaleX(1); transform-origin:left; }
+        .back-btn:hover { color:var(--deep); }
+        .back-btn span { position:relative; z-index:1; }
+
+        /* ── HERO ── */
+        .hero {
+            min-height:100vh; display:flex; flex-direction:column; justify-content:flex-end;
+            padding: 0 60px 80px;
+            position:relative; overflow:hidden;
+        }
+        .hero-bg {
+            position:absolute; inset:0;
+            background: radial-gradient(ellipse 80% 60% at 60% 40%, rgba(6,214,160,.07) 0%, transparent 70%),
+                        radial-gradient(ellipse 50% 50% at 20% 80%, rgba(239,71,111,.05) 0%, transparent 60%);
+        }
+        .hero-eyebrow {
+            font-family:'Space Mono',monospace; font-size:.7rem; letter-spacing:.4em;
+            color:var(--nebula); text-transform:uppercase; margin-bottom:18px;
+            opacity:0; animation:fadeUp .7s .2s forwards;
+        }
+        .hero-title {
+            font-family:'Orbitron',sans-serif; font-size:clamp(3rem,7vw,7rem);
+            font-weight:900; line-height:1; letter-spacing:-.02em; margin-bottom:8px;
+            opacity:0; animation:fadeUp .7s .35s forwards;
+        }
+        .hero-title em { font-style:normal; -webkit-text-stroke:1px var(--nebula); color:transparent; }
+        .hero-sub {
+            font-family:'Rajdhani',sans-serif; font-size:1.1rem; color:var(--dim);
+            font-weight:300; max-width:540px; line-height:1.8; margin-top:20px;
+            opacity:0; animation:fadeUp .7s .5s forwards;
+        }
+        .hero-line {
+            width:100%; height:1px; background:linear-gradient(to right,var(--nebula),rgba(6,214,160,.1),transparent);
+            margin-top:48px; opacity:0; animation:fadeUp .7s .65s forwards;
+        }
+        .hero-meta {
+            display:flex; justify-content:space-between; align-items:flex-end; margin-top:28px;
+            opacity:0; animation:fadeUp .7s .8s forwards;
+        }
+        .hero-stat { text-align:center; }
+        .hero-stat-val { font-family:'Orbitron',sans-serif; font-size:2rem; font-weight:700; color:var(--nebula); }
+        .hero-stat-lbl { font-family:'Space Mono',monospace; font-size:.58rem; letter-spacing:.2em; color:var(--dim); text-transform:uppercase; margin-top:4px; }
+
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+        /* ── TICKER ── */
+        .ticker-wrap { overflow:hidden; background:var(--nebula); padding:11px 0; position:relative; z-index:10; }
+        .ticker { display:flex; white-space:nowrap; animation:tick 35s linear infinite; }
+        .ticker-item { font-family:'Space Mono',monospace; font-size:.68rem; letter-spacing:.15em; color:var(--deep); text-transform:uppercase; padding:0 36px; }
+        .ticker-item::before { content:'◆  '; }
+        @keyframes tick { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+        /* ── SECTION HEADER ── */
+        .section { padding:100px 60px; max-width:1400px; margin:0 auto; }
+        .section-tag { font-family:'Space Mono',monospace; font-size:.62rem; letter-spacing:.35em; color:var(--nebula); text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+        .section-tag::before { content:''; width:28px; height:1px; background:var(--nebula); }
+        .section-heading { font-family:'Orbitron',sans-serif; font-size:clamp(1.8rem,3.5vw,3rem); font-weight:700; line-height:1.1; }
+        .section-heading em { font-style:normal; -webkit-text-stroke:1px rgba(6,214,160,.45); color:transparent; }
+
+        /* ── AGE CALCULATOR ── */
+        .calc-wrap {
+            margin:60px 0 0;
+            border:1px solid var(--card-b);
+            padding:48px 52px;
+            background:var(--card);
+            position:relative;
+            overflow:hidden;
+        }
+        .calc-wrap::before {
+            content:'';
+            position:absolute; top:0; left:0; right:0; height:2px;
+            background:linear-gradient(to right,var(--nebula),var(--plasma),transparent);
+        }
+        .calc-inner {
+            display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin-bottom:40px;
+        }
+        .calc-inner label { font-family:'Space Mono',monospace; font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:var(--dim); }
+        .age-input {
+            background:rgba(255,255,255,.04); border:1px solid var(--card-b);
+            color:#fff; font-family:'Orbitron',sans-serif; font-size:1rem;
+            padding:12px 20px; outline:none; width:180px; transition:border-color .3s;
+        }
+        .age-input:focus { border-color:var(--nebula); }
+        .calc-btn {
+            font-family:'Space Mono',monospace; font-size:.68rem; letter-spacing:.2em; text-transform:uppercase;
+            background:var(--nebula); color:var(--deep); border:none; padding:14px 32px;
+            cursor:pointer; font-weight:600; transition:all .3s; position:relative; overflow:hidden;
+        }
+        .calc-btn::before { content:''; position:absolute; inset:0; background:var(--plasma); transform:scaleX(0); transform-origin:left; transition:transform .35s; }
+        .calc-btn:hover::before { transform:scaleX(1); }
+        .calc-btn span { position:relative; z-index:1; }
+        .calc-btn:hover span { color:#fff; }
+
+        /* Age Results Grid */
+        .age-grid {
+            display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:2px;
+            border:1px solid rgba(255,255,255,.04);
+        }
+        .age-cell {
+            background:rgba(255,255,255,.02); padding:22px 18px; text-align:center;
+            border:1px solid rgba(255,255,255,.04); transition:background .3s;
+            position:relative; overflow:hidden;
+        }
+        .age-cell::after {
+            content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+            background:var(--planet-c,var(--nebula)); transform:scaleX(0); transition:transform .4s;
+        }
+        .age-cell:hover::after { transform:scaleX(1); }
+        .age-cell:hover { background:rgba(255,255,255,.05); }
+        .age-cell-name { font-family:'Orbitron',sans-serif; font-size:.65rem; letter-spacing:.15em; color:var(--dim); text-transform:uppercase; margin-bottom:10px; }
+        .age-cell-val { font-family:'Orbitron',sans-serif; font-size:1.3rem; font-weight:700; color:var(--planet-c,var(--nebula)); }
+        .age-cell-unit { font-family:'Space Mono',monospace; font-size:.55rem; color:var(--dim); margin-top:4px; }
+
+        /* ── PLANET TIMELINE ── */
+        .timeline-section { padding:100px 60px; }
+        .planets-list { margin-top:64px; display:flex; flex-direction:column; gap:2px; border:1px solid rgba(6,214,160,.08); }
+
+        .planet-row {
+            display:grid; grid-template-columns:280px 1fr 1fr; gap:0;
+            border:1px solid rgba(6,214,160,.06); background:rgba(255,255,255,.015);
+            transition:background .4s; position:relative; overflow:hidden;
+        }
+        .planet-row::before {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+            background:var(--planet-c,var(--nebula)); transform:scaleY(0); transition:transform .5s ease; transform-origin:top;
+        }
+        .planet-row:hover::before { transform:scaleY(1); }
+        .planet-row:hover { background:rgba(255,255,255,.03); }
+
+        /* Index col */
+        .planet-index {
+            padding:40px 36px; border-right:1px solid rgba(255,255,255,.04);
+            display:flex; flex-direction:column; justify-content:space-between;
+        }
+        .planet-num { font-family:'Space Mono',monospace; font-size:.6rem; letter-spacing:.2em; color:var(--dim); margin-bottom:16px; }
+        .planet-orb {
+            width:64px; height:64px; border-radius:50%; margin-bottom:16px;
+            background:var(--planet-bg); box-shadow:0 0 24px var(--planet-glow);
+            position:relative;
+        }
+        .planet-orb::after {
+            content:''; position:absolute; inset:0; border-radius:50%;
+            background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.4) 0%, transparent 60%);
+        }
+        .planet-name-big { font-family:'Orbitron',sans-serif; font-size:1.4rem; font-weight:700; color:#fff; margin-bottom:6px; }
+        .planet-badge {
+            display:inline-block; font-family:'Space Mono',monospace; font-size:.55rem;
+            letter-spacing:.12em; text-transform:uppercase; padding:4px 10px;
+            border:1px solid var(--planet-c); color:var(--planet-c); background:transparent;
+        }
+        .planet-orbit-info { margin-top:20px; font-family:'Space Mono',monospace; font-size:.6rem; color:var(--dim); line-height:1.8; }
+
+        /* Info col */
+        .planet-info {
+            padding:40px 36px; border-right:1px solid rgba(255,255,255,.04);
+            display:flex; flex-direction:column;
+        }
+        .planet-desc { font-size:.95rem; line-height:1.8; color:var(--dim); font-weight:300; flex-grow:1; }
+        .planet-age-box {
+            margin-top:24px; padding:16px 18px; background:rgba(255,255,255,.03);
+            border:1px solid rgba(255,255,255,.06);
+        }
+        .planet-age-lbl { font-family:'Space Mono',monospace; font-size:.58rem; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); margin-bottom:6px; }
+        .planet-age-val { font-family:'Orbitron',sans-serif; font-size:1.1rem; font-weight:700; color:var(--planet-c,var(--nebula)); }
+
+        /* Video col */
+        .planet-video { padding:20px; display:flex; flex-direction:column; gap:12px; justify-content:center; }
+        .video-wrap { position:relative; border-radius:0; overflow:hidden; background:#000; aspect-ratio:16/9; }
         .video-placeholder {
-            width: 100%;
-            aspect-ratio: 16/9;
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            position: relative;
-            cursor: pointer;
+            position:absolute; inset:0; cursor:pointer;
+            display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px;
+            background:linear-gradient(135deg,rgba(6,214,160,.08) 0%,rgba(2,12,19,.95) 100%);
+            transition:background .3s;
         }
-        
-        .video-wrapper {
-            position: relative;
-            border-radius: 20px;
-            overflow: hidden;
+        .video-placeholder:hover { background:linear-gradient(135deg,rgba(6,214,160,.14) 0%,rgba(2,12,19,.9) 100%); }
+        .play-ring {
+            width:56px; height:56px; border:1px solid var(--nebula); border-radius:50%;
+            display:flex; align-items:center; justify-content:center; transition:all .3s;
         }
-        
-        .close-video {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 10;
-            display: none;
+        .video-placeholder:hover .play-ring { background:var(--nebula); transform:scale(1.1); }
+        .play-tri {
+            width:0; height:0; border-top:9px solid transparent; border-bottom:9px solid transparent;
+            border-left:16px solid var(--nebula); margin-left:3px; transition:border-left-color .3s;
         }
-        
-        .video-error {
-            color: #ff4444;
-            padding: 1rem;
-            text-align: center;
-            background: rgba(255, 0, 0, 0.1);
-            border-radius: 8px;
-            margin-top: 1rem;
-            display: none;
-        }
-        
-        /* Blender download button styles */
-        .blend-download-btn {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            width: 100%;
-            justify-content: center;
-        }
+        .video-placeholder:hover .play-tri { border-left-color:var(--deep); }
+        .video-placeholder-txt { font-family:'Space Mono',monospace; font-size:.6rem; letter-spacing:.18em; color:var(--dim); text-transform:uppercase; }
+        .planet-video video { width:100%; aspect-ratio:16/9; display:none; }
 
-        .blend-download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        .dl-btn {
+            display:flex; align-items:center; justify-content:center; gap:8px;
+            font-family:'Space Mono',monospace; font-size:.62rem; letter-spacing:.15em; text-transform:uppercase;
+            background:transparent; border:1px solid var(--card-b); color:var(--nebula);
+            padding:10px 16px; cursor:pointer; transition:all .35s; width:100%;
         }
+        .dl-btn:hover { background:var(--nebula); color:var(--deep); }
 
-        .blend-download-btn svg {
-            width: 16px;
-            height: 16px;
-            fill: currentColor;
+        /* ── STATS SECTION ── */
+        .stats-grid {
+            display:grid; grid-template-columns:repeat(4,1fr); gap:2px;
+            border:1px solid rgba(6,214,160,.1); background:rgba(6,214,160,.06); margin-top:60px;
+        }
+        .stat-cell { background:var(--deep); padding:40px 24px; text-align:center; }
+        .stat-val { font-family:'Orbitron',sans-serif; font-size:2.5rem; font-weight:900; color:var(--nebula); }
+        .stat-lbl { font-family:'Space Mono',monospace; font-size:.6rem; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); margin-top:8px; }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top:1px solid rgba(6,214,160,.1);
+            padding:48px 60px;
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .footer-logo { font-family:'Orbitron',sans-serif; font-size:.8rem; letter-spacing:.25em; color:var(--nebula); }
+        .footer-copy { font-family:'Space Mono',monospace; font-size:.6rem; letter-spacing:.1em; color:rgba(255,255,255,.2); }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width:1100px) {
+            .planet-row { grid-template-columns:1fr 1fr; }
+            .planet-video { grid-column:1/-1; border-top:1px solid rgba(255,255,255,.04); }
+        }
+        @media (max-width:720px) {
+            .planet-row { grid-template-columns:1fr; }
+            .planet-index, .planet-info { border-right:none; }
+            .section, .timeline-section { padding:60px 24px; }
+            .hero { padding:0 24px 60px; }
+            .stats-grid { grid-template-columns:1fr 1fr; }
+            footer { flex-direction:column; gap:16px; text-align:center; }
+            .nav { padding:14px 20px; }
+            .hero-meta { flex-wrap:wrap; gap:24px; }
         }
     </style>
 </head>
-<body class="min-h-screen text-white">
-    <!-- Header -->
-    <header class="p-6 flex justify-between items-center">
-        <h1 class="text-3xl font-bold text-blue-400">Solar System Studio</h1>
-        <button class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-full transition-colors">
-            <a href="index.html" class="back-btn">← Back to Home</a>
-        </button>
-    </header>
+<body>
 
-    <!-- Main Container -->
-    <div class="container mx-auto px-6 pb-12">
-        <!-- Complete Journey Section -->
-        <section class="mb-16">
-            <div class="flex flex-col lg:flex-row gap-12 items-center">
-                <div class="lg:w-1/2">
-                    <div class="video-wrapper">
-                        <div class="video-placeholder" id="completeJourneyPlaceholder" onclick="playVideo(this, 'completeJourney')">
-                            <div class="play-button">
-                                <div class="play-icon"></div>
-                            </div>
-                            <div class="absolute bottom-6 left-6 right-6">
-                                <h3 class="text-2xl font-bold text-white mb-2">Complete Journey</h3>
-                            </div>
-                        </div>
-                        <video id="completeJourneyVideo" class="video-player" controls>
-                            <source src="solarsystem/solarsystem.mp4" type="video/mp4">
-                            <source src="solarsystem/solarsystem.webm" type="video/webm">
-                            Your browser does not support HTML5 video. 
-                            <a href="solarsystem/solarsystem.mp4">Download the video</a> instead.
-                        </video>
-                        <button class="close-video" onclick="stopVideo('completeJourneyVideo', 'completeJourneyPlaceholder')">&times;</button>
-                    </div>
-                    <div id="completeJourneyError" class="video-error">
-                        Video failed to load. Please check the file path and format.
-                    </div>
-                </div>
-                <div class="lg:w-1/2">
-                    <h2 class="text-5xl font-bold mb-6">Solar System Exploration</h2>
-                    <p class="text-xl text-gray-300 mb-8">
-                        Experience the complete journey through our solar system from the blazing Sun to the distant reaches of Pluto in this comprehensive visual showcase.
-                    </p>
-                    <button class="blend-download-btn" onclick="downloadBlendFile('solarsystem')">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                        </svg>
-                        Download Complete Blender Project
-                    </button>
-                </div>
-            </div>
-        </section>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="starfield" id="starfield"></div>
 
-        <!-- Age Calculator Section -->
-        <section class="mb-16">
-            <div class="age-calculator">
-                <h3 class="text-3xl font-bold text-center mb-6">
-                    Calculate Your Age on Other Planets
-                </h3>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <input 
-                        type="number" 
-                        id="earthAge" 
-                        placeholder="Enter your Earth age" 
-                        class="px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white/20 transition-all text-center"
-                    />
-                    <button 
-                        onclick="calculatePlanetAges()" 
-                        class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition-colors"
-                    >
-                        Calculate Ages
-                    </button>
-                </div>
-                <p class="text-center text-gray-400 mt-4">
-                    Enter your age to see how old you would be on each planet in our solar system!
-                </p>
-            </div>
-        </section>
-
-        <!-- Individual Planets Timeline -->
-        <section class="mb-16">
-            <h2 class="text-4xl font-bold mb-12 text-center">Individual Planet Showcases</h2>
-            
-            <div class="timeline">
-                <!-- Mercury -->
-                <div class="timeline-item">
-                    <div class="flex flex-col lg:flex-row gap-8 items-center">
-                        <div class="lg:w-1/2">
-                            <div class="card">
-                                <div class="planet-tag tag-mercury">Closest to Sun</div>
-                                <h3 class="text-3xl font-bold mb-4 text-blue-400">Mercury</h3>
-                                <p class="text-gray-300 mb-6">
-                                    Journey to the innermost planet where temperatures swing from freezing to blazing hot. Explore its cratered surface and extreme orbital mechanics.
-                                </p>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 100%"></div>
-                                </div>
-                                <div class="age-display">
-                                    <div class="text-gray-300 mb-2">Your age on Mercury:</div>
-                                    <div class="age-number" id="mercury-age-display">Enter your age above</div>
-                                </div>
-                                <button class="blend-download-btn" onclick="downloadBlendFile('mercury')">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                    </svg>
-                                    Download Blender File
-                                </button>
-                            </div>
-                        </div>
-                        <div class="lg:w-1/2">
-                            <div class="video-wrapper">
-                                <div class="video-placeholder" id="mercuryPlaceholder" onclick="playVideo(this, 'mercury')">
-                                    <div class="play-button">
-                                        <div class="play-icon"></div>
-                                    </div>
-                                </div>
-                                <video id="mercuryVideo" class="video-player" controls>
-                                    <source src="solarsystem/mercury.mp4" type="video/mp4">
-                                    <source src="solarsystem/mercury.webm" type="video/webm">
-                                    Your browser does not support the video tag.
-                                </video>
-                                <button class="close-video" onclick="stopVideo('mercuryVideo', 'mercuryPlaceholder')">&times;</button>
-                            </div>
-                            <div id="mercuryError" class="video-error">
-                                Video failed to load. Please check the file path and format.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Venus -->
-                <div class="timeline-item">
-                    <div class="flex flex-col lg:flex-row-reverse gap-8 items-center">
-                        <div class="lg:w-1/2">
-                            <div class="card">
-                                <div class="planet-tag tag-venus">Hottest Planet</div>
-                                <h3 class="text-3xl font-bold mb-4 text-blue-400">Venus</h3>
-                                <p class="text-gray-300 mb-6">
-                                    Discover the hellish world of Venus with its thick toxic atmosphere, sulfuric acid clouds, and surface temperatures hot enough to melt lead.
-                                </p>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 85%"></div>
-                                </div>
-                                <div class="age-display">
-                                    <div class="text-gray-300 mb-2">Your age on Venus:</div>
-                                    <div class="age-number" id="venus-age-display">Enter your age above</div>
-                                </div>
-                                <button class="blend-download-btn" onclick="downloadBlendFile('venus')">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                    </svg>
-                                    Download Blender File
-                                </button>
-                            </div>
-                        </div>
-                        <div class="lg:w-1/2">
-                            <div class="video-wrapper">
-                                <div class="video-placeholder" id="venusPlaceholder" onclick="playVideo(this, 'venus')">
-                                    <div class="play-button">
-                                        <div class="play-icon"></div>
-                                    </div>
-                                </div>
-                                <video id="venusVideo" class="video-player" controls>
-                                    <source src="solarsystem/venus.mp4" type="video/mp4">
-                                    <source src="solarsystem/venus.webm" type="video/webm">
-                                    Your browser does not support the video tag.
-                                </video>
-                                <button class="close-video" onclick="stopVideo('venusVideo', 'venusPlaceholder')">&times;</button>
-                            </div>
-                            <div id="venusError" class="video-error">
-                                Video failed to load. Please check the file path and format.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Earth -->
-                <div class="timeline-item">
-                    <div class="flex flex-col lg:flex-row gap-8 items-center">
-                        <div class="lg:w-1/2">
-                            <div class="card">
-                                <div class="planet-tag tag-earth">Our Home</div>
-                                <h3 class="text-3xl font-bold mb-4 text-blue-400">Earth</h3>
-                                <p class="text-gray-300 mb-6">
-                                    Experience our blue marble from space - the only known planet with life, featuring vast oceans, diverse climates, and complex ecosystems.
-                                </p>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 70%"></div>
-                                </div>
-                                <div class="age-display">
-                                    <div class="text-gray-300 mb-2">Your age on Earth:</div>
-                                    <div class="age-number" id="earth-age-display">Enter your age above</div>
-                                </div>
-                                <button class="blend-download-btn" onclick="downloadBlendFile('earth')">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                    </svg>
-                                    Download Blender File
-                                </button>
-                            </div>
-                        </div>
-                        <div class="lg:w-1/2">
-                            <div class="video-wrapper">
-                                <div class="video-placeholder" id="earthPlaceholder" onclick="playVideo(this, 'earth')">
-                                    <div class="play-button">
-                                        <div class="play-icon"></div>
-                                    </div>
-                                </div>
-                                <video id="earthVideo" class="video-player" controls>
-                                    <source src="solarsystem/earth.mp4" type="video/mp4">
-                                    <source src="solarsystem/earth.webm" type="video/webm">
-                                    Your browser does not support the video tag.
-                                </video>
-                                <button class="close-video" onclick="stopVideo('earthVideo', 'earthPlaceholder')">&times;</button>
-                            </div>
-                            <div id="earthError" class="video-error">
-                                Video failed to load. Please check the file path and format.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mars -->
-                <div class="timeline-item">
-                    <div class="flex flex-col lg:flex-row-reverse gap-8 items-center">
-                        <div class="lg:w-1/2">
-                            <div class="card">
-                                <div class="planet-tag tag-mars">The Red Planet</div>
-                                <h3 class="text-3xl font-bold mb-4 text-blue-400">Mars</h3>
-                                <p class="text-gray-300 mb-6">
-                                    Explore the rusty red world that captivates scientists and dreamers alike. Witness its massive volcanoes, deep canyons, and polar ice caps.
-                                </p>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 55%"></div>
-                                </div>
-                                <div class="age-display">
-                                    <div class="text-gray-300 mb-2">Your age on Mars:</div>
-                                    <div class="age-number" id="mars-age-display">Enter your age above</div>
-                                </div>
-                                <button class="blend-download-btn" onclick="downloadBlendFile('mars')">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                    </svg>
-                                    Download Blender File
-                                </button>
-                            </div>
-                        </div>
-                        <div class="lg:w-1/2">
-                            <div class="video-wrapper">
-                                <div class="video-placeholder" id="marsPlaceholder" onclick="playVideo(this, 'mars')">
-                                    <div class="play-button">
-                                        <div class="play-icon"></div>
-                                    </div>
-                                </div>
-                                <video id="marsVideo" class="video-player" controls>
-                                    <source src="solarsystem/mars.mp4" type="video/mp4">
-                                    <source src="solarsystem/mars.webm" type="video/webm">
-                                    Your browser does not support the video tag.
-                                </video>
-                                <button class="close-video" onclick="stopVideo('marsVideo', 'marsPlaceholder')">&times;</button>
-                            </div>
-                            <div id="marsError" class="video-error">
-                                Video failed to load. Please check the file path and format.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Jupiter -->
-                <div class="timeline-item">
-                    <div class="flex flex-col lg:flex-row gap-8 items-center">
-                        <div class="lg:w-1/2">
-                            <div class="card">
-                                <div class="planet-tag tag-jupiter">Gas Giant</div>
-                                <h3 class="text-3xl font-bold mb-4 text-blue-400">Jupiter</h3>
-                                <p class="text-gray-300 mb-6">
-                                    Marvel at the king of planets with its Great Red Spot, swirling storms, and family of fascinating moons including the volcanic Io and icy Europa.
-                                </p>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 40%"></div>
-                                </div>
-                                <div class="age-display">
-                                    <div class="text-gray-300 mb-2">Your age on Jupiter:</div>
-                                    <div class="age-number" id="jupiter-age-display">Enter your age above</div>
-                                </div>
-                                <button class="blend-download-btn" onclick="downloadBlendFile('jupiter')">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                    </svg>
-                                    Download Blender File
-                                </button>
-                            </div>
-                        </div>
-                        <div class="lg:w-1/2">
-                            <div class="video-wrapper">
-                                <div class="video-placeholder" id="jupiterPlaceholder" onclick="playVideo(this, 'jupiter')">
-                                    <div class="play-button">
-                                        <div class="play-icon"></div>
-                                    </div>
-                                </div>
-                                <video id="jupiterVideo" class="video-player" controls>
-                                    <source src="solarsystem/jupiter.mp4" type="video/mp4">
-                                    <source src="solarsystem/jupiter.webm" type="video/webm">
-                                    Your browser does not support the video tag.
-                                </video>
-                                <button class="close-video" onclick="stopVideo('jupiterVideo', 'jupiterPlaceholder')">&times;</button>
-                            </div>
-                            <div id="jupiterError" class="video-error">
-                                Video failed to load. Please check the file path and format.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Saturn -->
-                <div class="timeline-item">
-                    <div class="flex flex-col lg:flex-row-reverse gap-8 items-center">
-                        <div class="lg:w-1/2">
-                            <div class="card">
-                                <div class="planet-tag tag-saturn">Ringed Wonder</div>
-                                <h3 class="text-3xl font-bold mb-4 text-blue-400">Saturn</h3>
-                                <p class="text-gray-300 mb-6">
-                                    Witness the breathtaking beauty of Saturn's magnificent ring system and discover its diverse collection of moons, including mysterious Titan.
-                                </p>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 25%"></div>
-                                </div>
-                                <div class="age-display">
-                                    <div class="text-gray-300 mb-2">Your age on Saturn:</div>
-                                    <div class="age-number" id="saturn-age-display">Enter your age above</div>
-                                </div>
-                                <button class="blend-download-btn" onclick="downloadBlendFile('saturn')">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                    </svg>
-                                    Download Blender File
-                                </button>
-                            </div>
-                        </div>
-                        <div class="lg:w-1/2">
-                            <div class="video-wrapper">
-                                <div class="video-placeholder" id="saturnPlaceholder" onclick="playVideo(this, 'saturn')">
-                                    <div class="play-button">
-                                        <div class="play-icon"></div>
-                                    </div>
-                                </div>
-                                <video id="saturnVideo" class="video-player" controls>
-                                    <source src="solarsystem/saturn.mp4" type="video/mp4">
-                                    <source src="solarsystem/saturn.webm" type="video/webm">
-                                    Your browser does not support the video tag.
-                                </video>
-                                <button class="close-video" onclick="stopVideo('saturnVideo', 'saturnPlaceholder')">&times;</button>
-                            </div>
-                            <div id="saturnError" class="video-error">
-                                Video failed to load. Please check the file path and format.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Uranus -->
-                <div class="timeline-item">
-                    <div class="flex flex-col lg:flex-row gap-8 items-center">
-                        <div class="lg:w-1/2">
-                            <div class="card">
-                                <div class="planet-tag tag-uranus">Ice Giant</div>
-                                <h3 class="text-3xl font-bold mb-4 text-blue-400">Uranus</h3>
-                                <p class="text-gray-300 mb-6">
-                                    Explore the tilted ice giant that rolls on its side as it orbits the Sun, with its unique magnetic field and faint ring system.
-                                </p>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 10%"></div>
-                                </div>
-                                <div class="age-display">
-                                    <div class="text-gray-300 mb-2">Your age on Uranus:</div>
-                                    <div class="age-number" id="uranus-age-display">Enter your age above</div>
-                                </div>
-                                <button class="blend-download-btn" onclick="downloadBlendFile('uranus')">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                    </svg>
-                                    Download Blender File
-                                </button>
-                            </div>
-                        </div>
-                        <div class="lg:w-1/2">
-                            <div class="video-wrapper">
-                                <div class="video-placeholder" id="uranusPlaceholder" onclick="playVideo(this, 'uranus')">
-                                    <div class="play-button">
-                                        <div class="play-icon"></div>
-                                    </div>
-                                </div>
-                                <video id="uranusVideo" class="video-player" controls>
-                                    <source src="solarsystem/uranus.mp4" type="video/mp4">
-                                    <source src="solarsystem/uranus.webm" type="video/webm">
-                                    Your browser does not support the video tag.
-                                </video>
-                                <button class="close-video" onclick="stopVideo('uranusVideo', 'uranusPlaceholder')">&times;</button>
-                            </div>
-                            <div id="uranusError" class="video-error">
-                                Video failed to load. Please check the file path and format.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Neptune -->
-                <div class="timeline-item">
-                    <div class="flex flex-col lg:flex-row-reverse gap-8 items-center">
-                        <div class="lg:w-1/2">
-                            <div class="card">
-                                <div class="planet-tag tag-neptune">Windy World</div>
-                                <h3 class="text-3xl font-bold mb-4 text-blue-400">Neptune</h3>
-                                <p class="text-gray-300 mb-6">
-                                    Journey to the windiest planet in our solar system, where supersonic winds reach incredible speeds in the deep blue atmosphere.
-                                </p>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 5%"></div>
-                                </div>
-                                <div class="age-display">
-                                    <div class="text-gray-300 mb-2">Your age on Neptune:</div>
-                                    <div class="age-number" id="neptune-age-display">Enter your age above</div>
-                                </div>
-                                <button class="blend-download-btn" onclick="downloadBlendFile('neptune')">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                    </svg>
-                                    Download Blender File
-                                </button>
-                            </div>
-                        </div>
-                        <div class="lg:w-1/2">
-                            <div class="video-wrapper">
-                                <div class="video-placeholder" id="neptunePlaceholder" onclick="playVideo(this, 'neptune')">
-                                    <div class="play-button">
-                                        <div class="play-icon"></div>
-                                    </div>
-                                </div>
-                                <video id="neptuneVideo" class="video-player" controls>
-                                    <source src="solarsystem/neptune.mp4" type="video/mp4">
-                                    <source src="solarsystem/neptune.webm" type="video/webm">
-                                    Your browser does not support the video tag.
-                                </video>
-                                <button class="close-video" onclick="stopVideo('neptuneVideo', 'neptunePlaceholder')">&times;</button>
-                            </div>
-                            <div id="neptuneError" class="video-error">
-                                Video failed to load. Please check the file path and format.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pluto -->
-                <div class="timeline-item">
-                    <div class="flex flex-col lg:flex-row gap-8 items-center">
-                        <div class="lg:w-1/2">
-                            <div class="card">
-                                <div class="planet-tag tag-pluto">Dwarf Planet</div>
-                                <h3 class="text-3xl font-bold mb-4 text-blue-400">Pluto</h3>
-                                <p class="text-gray-300 mb-6">
-                                    Venture to the edge of our solar system to explore the heart-shaped features of Pluto and its complex relationship with moon Charon.
-                                </p>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 0%"></div>
-                                </div>
-                                <div class="age-display">
-                                    <div class="text-gray-300 mb-2">Your age on Pluto:</div>
-                                    <div class="age-number" id="pluto-age-display">Enter your age above</div>
-                                </div>
-                                <button class="blend-download-btn" onclick="downloadBlendFile('pluto')">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                    </svg>
-                                    Download Blender File
-                                </button>
-                            </div>
-                        </div>
-                        <div class="lg:w-1/2">
-                            <div class="video-wrapper">
-                                <div class="video-placeholder" id="plutoPlaceholder" onclick="playVideo(this, 'pluto')">
-                                    <div class="play-button">
-                                        <div class="play-icon"></div>
-                                    </div>
-                                </div>
-                                <video id="plutoVideo" class="video-player" controls>
-                                    <source src="solarsystem/pluto.mp4" type="video/mp4">
-                                    <source src="solarsystem/pluto.webm" type="video/webm">
-                                    Your browser does not support the video tag.
-                                </video>
-                                <button class="close-video" onclick="stopVideo('plutoVideo', 'plutoPlaceholder')">&times;</button>
-                            </div>
-                            <div id="plutoError" class="video-error">
-                                Video failed to load. Please check the file path and format.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Planet Age Calculator -->
-        <section class="bg-indigo-50 py-12 px-6 rounded-3xl">
-            <div class="max-w-5xl mx-auto">
-                <h3 class="text-3xl font-bold text-center mb-6 text-gray-800">
-                    Age Comparison Summary
-                </h3>
-                <div class="grid md:grid-cols-3 gap-6" id="planet-sections">
-                    <!-- Mercury -->
-                    <div class="bg-white p-6 rounded shadow text-center">
-                        <h4 class="text-xl font-bold mb-2 text-gray-800">Mercury</h4>
-                        <p id="mercury-age" class="text-gray-700">—</p>
-                    </div>
-                    <!-- Venus -->
-                    <div class="bg-white p-6 rounded shadow text-center">
-                        <h4 class="text-xl font-bold mb-2 text-gray-800">Venus</h4>
-                        <p id="venus-age" class="text-gray-700">—</p>
-                    </div>
-                    <!-- Earth -->
-                    <div class="bg-white p-6 rounded shadow text-center">
-                        <h4 class="text-xl font-bold mb-2 text-gray-800">Earth</h4>
-                        <p id="earth-age" class="text-gray-700">—</p>
-                    </div>
-                    <!-- Mars -->
-                    <div class="bg-white p-6 rounded shadow text-center">
-                        <h4 class="text-xl font-bold mb-2 text-gray-800">Mars</h4>
-                        <p id="mars-age" class="text-gray-700">—</p>
-                    </div>
-                    <!-- Jupiter -->
-                    <div class="bg-white p-6 rounded shadow text-center">
-                        <h4 class="text-xl font-bold mb-2 text-gray-800">Jupiter</h4>
-                        <p id="jupiter-age" class="text-gray-700">—</p>
-                    </div>
-                    <!-- Saturn -->
-                    <div class="bg-white p-6 rounded shadow text-center">
-                        <h4 class="text-xl font-bold mb-2 text-gray-800">Saturn</h4>
-                        <p id="saturn-age" class="text-gray-700">—</p>
-                    </div>
-                    <!-- Uranus -->
-                    <div class="bg-white p-6 rounded shadow text-center">
-                        <h4 class="text-xl font-bold mb-2 text-gray-800">Uranus</h4>
-                        <p id="uranus-age" class="text-gray-700">—</p>
-                    </div>
-                    <!-- Neptune -->
-                    <div class="bg-white p-6 rounded shadow text-center">
-                        <h4 class="text-xl font-bold mb-2 text-gray-800">Neptune</h4>
-                        <p id="neptune-age" class="text-gray-700">—</p>
-                    </div>
-                    <!-- Pluto -->
-                    <div class="bg-white p-6 rounded shadow text-center">
-                        <h4 class="text-xl font-bold mb-2 text-gray-800">Pluto</h4>
-                        <p id="pluto-age" class="text-gray-700">—</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Solar System Stats -->
-        <section class="mt-16">
-            <div class="card">
-                <h3 class="text-3xl font-bold mb-6 text-center">Solar System Statistics</h3>
-                <div class="overview-stats">
-                    <div class="stat-item">
-                        <div class="stat-number">4.6B</div>
-                        <div class="text-gray-400">Years Old</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">8</div>
-                        <div class="text-gray-400">Planets</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">200+</div>
-                        <div class="text-gray-400">Known Moons</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">1M+</div>
-                        <div class="text-gray-400">Asteroids</div>
-                    </div>
-                </div>
-            </div>
-        </section>
+<!-- NAV -->
+<nav class="nav" id="nav">
+    <a href="index.html" class="nav-logo">M &amp; A</a>
+    <div class="nav-right">
+        <a href="rotoscope.html" class="nav-link">Rotoscope</a>
+        <a href="index.html" class="back-btn"><span>← Home</span></a>
     </div>
+</nav>
 
-    <script>
-        // Video play functionality with error handling
-        function playVideo(placeholderElement, planetName) {
-            const videoId = planetName + 'Video';
-            const videoElement = document.getElementById(videoId);
-            const errorElement = document.getElementById(planetName + 'Error');
-            
-            // Hide the placeholder and error message
-            placeholderElement.style.display = 'none';
-            errorElement.style.display = 'none';
-            
-            // Show the video and close button
-            videoElement.style.display = 'block';
-            
-            // Show the close button
-            const closeButton = videoElement.nextElementSibling;
-            closeButton.style.display = 'block';
-            
-            // Attempt to play the video
-            const playPromise = videoElement.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.error('Video play failed:', error);
-                    errorElement.style.display = 'block';
-                    videoElement.style.display = 'none';
-                    placeholderElement.style.display = 'block';
-                    closeButton.style.display = 'none';
-                });
-            }
-        }
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-bg"></div>
+    <p class="hero-eyebrow">Solar System Studio</p>
+    <h1 class="hero-title">JOURNEY<br>THROUGH<br><em>SPACE</em></h1>
+    <p class="hero-sub">An immersive exploration of our solar system — 9 celestial bodies, rendered in Blender v4.4 with photorealistic detail.</p>
+    <div class="hero-line"></div>
+    <div class="hero-meta">
+        <div class="hero-stat"><div class="hero-stat-val">9</div><div class="hero-stat-lbl">Planets</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">4.6B</div><div class="hero-stat-lbl">Years Old</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">200+</div><div class="hero-stat-lbl">Moons</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">1M+</div><div class="hero-stat-lbl">Asteroids</div></div>
+    </div>
+</section>
 
-        function stopVideo(videoId, placeholderId) {
-            const videoElement = document.getElementById(videoId);
-            const placeholderElement = document.getElementById(placeholderId);
-            const closeButton = document.querySelector(`#${videoId} + .close-video`);
-            
-            videoElement.pause();
-            videoElement.currentTime = 0;
-            videoElement.style.display = 'none';
-            placeholderElement.style.display = 'block';
-            closeButton.style.display = 'none';
-        }
+<!-- TICKER -->
+<div class="ticker-wrap" aria-hidden="true">
+    <div class="ticker">
+        <span class="ticker-item">Mercury</span><span class="ticker-item">Venus</span><span class="ticker-item">Earth</span><span class="ticker-item">Mars</span><span class="ticker-item">Jupiter</span><span class="ticker-item">Saturn</span><span class="ticker-item">Uranus</span><span class="ticker-item">Neptune</span><span class="ticker-item">Pluto</span>
+        <span class="ticker-item">Mercury</span><span class="ticker-item">Venus</span><span class="ticker-item">Earth</span><span class="ticker-item">Mars</span><span class="ticker-item">Jupiter</span><span class="ticker-item">Saturn</span><span class="ticker-item">Uranus</span><span class="ticker-item">Neptune</span><span class="ticker-item">Pluto</span>
+    </div>
+</div>
 
-        // Setup video error handlers
-        document.addEventListener('DOMContentLoaded', function() {
-            const videos = document.querySelectorAll('video');
-            videos.forEach(video => {
-                video.addEventListener('error', function() {
-                    const videoId = video.id;
-                    const planetName = videoId.replace('Video', '');
-                    const errorElement = document.getElementById(planetName + 'Error');
-                    
-                    console.error('Video load error:', video.error);
-                    errorElement.style.display = 'block';
-                    video.style.display = 'none';
-                    
-                    // Show placeholder again if video fails
-                    const placeholder = document.getElementById(planetName + 'Placeholder');
-                    if (placeholder) {
-                        placeholder.style.display = 'block';
-                    }
-                });
-            });
-        });
+<!-- AGE CALCULATOR -->
+<div style="max-width:1400px;margin:0 auto;">
+    <section class="section" style="padding-bottom:0;">
+        <p class="section-tag">Interactive Tool</p>
+        <h2 class="section-heading">Your Age on <em>Every World</em></h2>
+    </section>
+    <div style="padding:0 60px 100px; max-width:1400px; margin:0 auto;">
+        <div class="calc-wrap">
+            <div class="calc-inner">
+                <label>Earth Age</label>
+                <input class="age-input" type="number" id="earthAge" placeholder="e.g. 20" min="1" max="150" />
+                <button class="calc-btn" onclick="calculatePlanetAges()"><span>Calculate →</span></button>
+            </div>
+            <div class="age-grid" id="ageGrid">
+                <div class="age-cell" style="--planet-c:var(--mercury-c)"><div class="age-cell-name">Mercury</div><div class="age-cell-val" id="ag-mercury">—</div><div class="age-cell-unit">years old</div></div>
+                <div class="age-cell" style="--planet-c:var(--venus-c)"><div class="age-cell-name">Venus</div><div class="age-cell-val" id="ag-venus">—</div><div class="age-cell-unit">years old</div></div>
+                <div class="age-cell" style="--planet-c:var(--earth-c)"><div class="age-cell-name">Earth</div><div class="age-cell-val" id="ag-earth">—</div><div class="age-cell-unit">years old</div></div>
+                <div class="age-cell" style="--planet-c:var(--mars-c)"><div class="age-cell-name">Mars</div><div class="age-cell-val" id="ag-mars">—</div><div class="age-cell-unit">years old</div></div>
+                <div class="age-cell" style="--planet-c:var(--jupiter-c)"><div class="age-cell-name">Jupiter</div><div class="age-cell-val" id="ag-jupiter">—</div><div class="age-cell-unit">years old</div></div>
+                <div class="age-cell" style="--planet-c:var(--saturn-c)"><div class="age-cell-name">Saturn</div><div class="age-cell-val" id="ag-saturn">—</div><div class="age-cell-unit">years old</div></div>
+                <div class="age-cell" style="--planet-c:var(--uranus-c)"><div class="age-cell-name">Uranus</div><div class="age-cell-val" id="ag-uranus">—</div><div class="age-cell-unit">years old</div></div>
+                <div class="age-cell" style="--planet-c:var(--neptune-c)"><div class="age-cell-name">Neptune</div><div class="age-cell-val" id="ag-neptune">—</div><div class="age-cell-unit">years old</div></div>
+                <div class="age-cell" style="--planet-c:var(--pluto-c)"><div class="age-cell-name">Pluto</div><div class="age-cell-val" id="ag-pluto">—</div><div class="age-cell-unit">years old</div></div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // Planet Age Calculator
-        const planetOrbitalPeriods = {
-            mercury: 0.24,
-            venus: 0.62,
-            earth: 1,
-            mars: 1.88,
-            jupiter: 11.86,
-            saturn: 29.46,
-            uranus: 84.01,
-            neptune: 164.8,
-            pluto: 248.6
-        };
+<!-- COMPLETE JOURNEY -->
+<div style="max-width:1400px;margin:0 auto;padding:0 60px 100px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;border:1px solid rgba(6,214,160,.1);">
+        <div style="padding:48px;background:var(--card);border:1px solid var(--card-b);">
+            <p style="font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--nebula);text-transform:uppercase;margin-bottom:16px;">Featured Project</p>
+            <h2 style="font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:700;margin-bottom:20px;line-height:1.2;">Complete Solar System Journey</h2>
+            <p style="color:var(--dim);font-size:.95rem;line-height:1.8;font-weight:300;margin-bottom:32px;">Experience the full cinematic tour from the blazing Sun to the distant reaches of Pluto — all rendered in Blender v4.4 with photorealistic lighting and materials.</p>
+            <button class="dl-btn" onclick="downloadBlendFile('solarsystem')" style="max-width:280px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                Download Complete Project
+            </button>
+        </div>
+        <div style="background:#000;position:relative;">
+            <div class="video-wrap" style="aspect-ratio:unset;height:100%;min-height:240px;">
+                <div class="video-placeholder" id="ph-complete" onclick="playVid('complete')">
+                    <div class="play-ring"><div class="play-tri"></div></div>
+                    <div class="video-placeholder-txt">Play Full Journey</div>
+                </div>
+                <video id="vid-complete" style="width:100%;height:100%;object-fit:cover;display:none;" controls>
+                    <source src="solarsystem/solarsystem.mp4" type="video/mp4">
+                </video>
+            </div>
+        </div>
+    </div>
+</div>
 
-        function calculatePlanetAges() {
-            const earthAge = parseFloat(document.getElementById("earthAge").value);
-            if (isNaN(earthAge) || earthAge <= 0) {
-                alert("Please enter a valid age (positive number).");
-                return;
-            }
+<!-- PLANET TIMELINE -->
+<section class="timeline-section" style="max-width:1400px;margin:0 auto;">
+    <p class="section-tag">Planet Showcase</p>
+    <h2 class="section-heading">Individual <em>Planets</em></h2>
 
-            // Update both the individual planet displays and the summary section
-            for (const planet in planetOrbitalPeriods) {
-                const age = (earthAge / planetOrbitalPeriods[planet]).toFixed(2);
-                
-                // Update individual planet showcase displays
-                const showcaseElement = document.getElementById(`${planet}-age-display`);
-                if (showcaseElement) {
-                    showcaseElement.textContent = `${age} years old`;
-                }
+    <div class="planets-list" id="planetsList">
+        <!-- Planets injected by JS -->
+    </div>
+</section>
 
-                // Update summary section displays
-                const summaryElement = document.getElementById(`${planet}-age`);
-                if (summaryElement) {
-                    summaryElement.textContent = `${age} years old`;
-                }
-            }
-        }
+<!-- STATS -->
+<div style="padding:0 60px 100px;max-width:1400px;margin:0 auto;">
+    <p class="section-tag" style="padding-top:20px;">By the Numbers</p>
+    <h2 class="section-heading">Solar System <em>Stats</em></h2>
+    <div class="stats-grid">
+        <div class="stat-cell"><div class="stat-val">4.6B</div><div class="stat-lbl">Years Old</div></div>
+        <div class="stat-cell"><div class="stat-val">8</div><div class="stat-lbl">Major Planets</div></div>
+        <div class="stat-cell"><div class="stat-val">200+</div><div class="stat-lbl">Known Moons</div></div>
+        <div class="stat-cell"><div class="stat-val">1M+</div><div class="stat-lbl">Asteroids</div></div>
+    </div>
+</div>
 
-        // Blender file download function
-        function downloadBlendFile(planetName) {
-            // Map planet names to blend file names
-            const blendFiles = {
-                'mercury': 'mercury.blend',
-                'venus': 'venus.blend',
-                'earth': 'earth.blend',
-                'mars': 'mars.blend',
-                'jupiter': 'jupiter.blend',
-                'saturn': 'saturn.blend',
-                'uranus': 'uranus.blend',
-                'neptune': 'neptune.blend',
-                'pluto': 'pluto.blend',
-                'solarsystem': 'ROSARIO-SOLAR_SYSTEM.blend'
-            };
+<!-- FOOTER -->
+<footer>
+    <div class="footer-logo">Solar System Studio</div>
+    <div class="footer-copy">&copy; 2025 Multimedia &amp; Authoring · BSIT-S-2A-T</div>
+</footer>
 
-            const fileName = blendFiles[planetName];
-            if (!fileName) return;
+<script>
+/* ── STARS ── */
+const sf = document.getElementById('starfield');
+for (let i=0;i<160;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const sz=Math.random()*2.4+.4;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${Math.random()*5+3}s;--dl:${Math.random()*6}s;--a:${Math.random()*.3+.05};--b:${Math.random()*.7+.3}`;
+    sf.appendChild(s);
+}
 
-            // Create a temporary link element
-            const link = document.createElement('a');
-            link.href = `blender_files/${fileName}`;
-            link.download = fileName;
-            
-            // Append to the document, trigger click, then remove
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    </script>
+/* ── CURSOR ── */
+const cur=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+document.addEventListener('mousemove',e=>{
+    cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px';
+    ring.style.left=e.clientX+'px'; ring.style.top=e.clientY+'px';
+});
+
+/* ── NAV ── */
+window.addEventListener('scroll',()=>{ document.getElementById('nav').classList.toggle('solid',scrollY>60); });
+
+/* ── PLANET DATA ── */
+const planets = [
+    { id:'mercury', name:'Mercury', badge:'Closest to Sun', color:'var(--mercury-c)', bg:'radial-gradient(circle at 35% 35%,#d4ccc5,#8c7853)', glow:'rgba(140,120,83,.5)', period:0.24, dist:'0.39 AU', orbit:'88 days', desc:'The innermost planet, where temperatures swing between −180°C and 430°C. Its cratered surface bears the marks of 4 billion years of cosmic bombardment.' },
+    { id:'venus', name:'Venus', badge:'Hottest Planet', color:'var(--venus-c)', bg:'radial-gradient(circle at 35% 35%,#ffe0b2,#ff9800 50%,#e65100)', glow:'rgba(255,152,0,.5)', period:0.62, dist:'0.72 AU', orbit:'225 days', desc:'The hellish twin — thick toxic atmosphere, sulfuric acid clouds, and surface temperatures over 465°C. The most extreme greenhouse effect in the solar system.' },
+    { id:'earth', name:'Earth', badge:'Our Home', color:'var(--earth-c)', bg:'radial-gradient(circle at 35% 35%,#80deea,#0288d1 40%,#01579b)', glow:'rgba(2,136,209,.6)', period:1, dist:'1.00 AU', orbit:'365 days', desc:'The pale blue dot — the only known world bearing life. Vast oceans, dynamic weather systems, and a magnetic shield make it a cosmic sanctuary.' },
+    { id:'mars', name:'Mars', badge:'The Red Planet', color:'var(--mars-c)', bg:'radial-gradient(circle at 35% 35%,#ff8a65,#d32f2f 50%,#8b0000)', glow:'rgba(211,47,47,.5)', period:1.88, dist:'1.52 AU', orbit:'687 days', desc:'The rusty red world of Olympus Mons — the tallest volcano in the solar system — and Valles Marineris, a canyon system that dwarfs the Grand Canyon.' },
+    { id:'jupiter', name:'Jupiter', badge:'Gas Giant', color:'var(--jupiter-c)', bg:'radial-gradient(circle at 35% 35%,#ffe0b2,#ff8a65 30%,#bf360c)', glow:'rgba(255,138,101,.5)', period:11.86, dist:'5.20 AU', orbit:'12 years', desc:'King of the solar system. The Great Red Spot — a storm larger than Earth — has raged for centuries. Its 95 moons include volcanic Io and icy Europa.' },
+    { id:'saturn', name:'Saturn', badge:'Ringed Wonder', color:'var(--saturn-c)', bg:'radial-gradient(circle at 35% 35%,#fff9c4,#ffd166 40%,#ff8f00)', glow:'rgba(255,209,102,.5)', period:29.46, dist:'9.58 AU', orbit:'29 years', desc:'The jewel of the solar system. Its magnificent ring system spans 282,000 km yet is only about 100 meters thick — made of ice and rock particles.' },
+    { id:'uranus', name:'Uranus', badge:'Ice Giant', color:'var(--uranus-c)', bg:'radial-gradient(circle at 35% 35%,#b2ebf2,#00bcd4 40%,#006064)', glow:'rgba(0,188,212,.5)', period:84.01, dist:'19.2 AU', orbit:'84 years', desc:'The tilted ice giant that rolls through space on its side — an axial tilt of 98°. Its faint ring system and 27 moons orbit this pale blue-green world.' },
+    { id:'neptune', name:'Neptune', badge:'Windy World', color:'var(--neptune-c)', bg:'radial-gradient(circle at 35% 35%,#90caf9,#3f51b5 40%,#1a237e)', glow:'rgba(63,81,181,.5)', period:164.8, dist:'30.1 AU', orbit:'165 years', desc:'The windiest planet, with supersonic gusts reaching 2,100 km/h. Its deep blue atmosphere and the Great Dark Spot mirror Jupiter\'s own storms.' },
+    { id:'pluto', name:'Pluto', badge:'Dwarf Planet', color:'var(--pluto-c)', bg:'radial-gradient(circle at 35% 35%,#e0e0e0,#9e9e9e 40%,#424242)', glow:'rgba(158,158,158,.4)', period:248.6, dist:'39.5 AU', orbit:'248 years', desc:'The heart of the solar system\'s edge — Pluto\'s Tombaugh Regio, a vast nitrogen-ice plain, shows this dwarf world is geologically active.' },
+];
+
+/* ── BUILD PLANET ROWS ── */
+const list = document.getElementById('planetsList');
+planets.forEach((p,i) => {
+    list.innerHTML += `
+    <div class="planet-row" style="--planet-c:${p.color}">
+        <div class="planet-index">
+            <div>
+                <div class="planet-num">${String(i+1).padStart(2,'0')} / 09</div>
+                <div class="planet-orb" style="--planet-bg:${p.bg};--planet-glow:${p.glow};background:${p.bg};box-shadow:0 0 24px ${p.glow};"></div>
+                <div class="planet-name-big">${p.name}</div>
+                <span class="planet-badge" style="--planet-c:${p.color}">${p.badge}</span>
+            </div>
+            <div class="planet-orbit-info">
+                Distance: ${p.dist}<br>
+                Orbital period: ${p.orbit}
+            </div>
+        </div>
+        <div class="planet-info">
+            <p class="planet-desc">${p.desc}</p>
+            <div class="planet-age-box">
+                <div class="planet-age-lbl">Your age on ${p.name}</div>
+                <div class="planet-age-val" id="pr-${p.id}" style="color:${p.color}">Enter age above</div>
+            </div>
+            <button class="dl-btn" style="margin-top:16px;color:${p.color};border-color:rgba(255,255,255,.1);" onclick="downloadBlendFile('${p.id}')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                Download ${p.name}.blend
+            </button>
+        </div>
+        <div class="planet-video">
+            <div class="video-wrap">
+                <div class="video-placeholder" id="ph-${p.id}" onclick="playVid('${p.id}')">
+                    <div class="play-ring" style="border-color:${p.color}">
+                        <div class="play-tri" style="border-left-color:${p.color}"></div>
+                    </div>
+                    <div class="video-placeholder-txt">Play ${p.name}</div>
+                </div>
+                <video id="vid-${p.id}" style="width:100%;display:none;" controls>
+                    <source src="solarsystem/${p.id}.mp4" type="video/mp4">
+                </video>
+            </div>
+        </div>
+    </div>`;
+});
+
+/* ── VIDEO PLAY ── */
+function playVid(id){
+    const ph=document.getElementById('ph-'+id);
+    const vid=document.getElementById('vid-'+id);
+    ph.style.display='none';
+    vid.style.display='block';
+    vid.play().catch(()=>{vid.style.display='none'; ph.style.display='flex';});
+    vid.addEventListener('ended',()=>{vid.style.display='none'; ph.style.display='flex';},{once:true});
+}
+
+/* ── AGE CALCULATOR ── */
+const periods = { mercury:.24,venus:.62,earth:1,mars:1.88,jupiter:11.86,saturn:29.46,uranus:84.01,neptune:164.8,pluto:248.6 };
+function calculatePlanetAges(){
+    const age=parseFloat(document.getElementById('earthAge').value);
+    if(isNaN(age)||age<=0){ alert('Please enter a valid age.'); return; }
+    for(const [planet,period] of Object.entries(periods)){
+        const a=(age/period).toFixed(2);
+        const s=document.getElementById('ag-'+planet);
+        if(s) animateVal(s,a);
+        const r=document.getElementById('pr-'+planet);
+        if(r) r.textContent=a+' yrs';
+    }
+}
+function animateVal(el,target){
+    const t=parseFloat(target); let c=0;
+    const step=t/30;
+    const tm=setInterval(()=>{
+        c+=step; if(c>=t){c=t;clearInterval(tm);}
+        el.textContent=c.toFixed(2);
+    },30);
+}
+document.getElementById('earthAge').addEventListener('keydown',e=>{if(e.key==='Enter')calculatePlanetAges();});
+
+/* ── DOWNLOAD ── */
+const blendMap={mercury:'mercury.blend',venus:'venus.blend',earth:'earth.blend',mars:'mars.blend',jupiter:'jupiter.blend',saturn:'saturn.blend',uranus:'uranus.blend',neptune:'neptune.blend',pluto:'pluto.blend',solarsystem:'ROSARIO-SOLAR_SYSTEM.blend'};
+function downloadBlendFile(p){
+    const f=blendMap[p]; if(!f)return;
+    const a=document.createElement('a'); a.href='blender_files/'+f; a.download=f;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+/* ── SMOOTH SCROLL ── */
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});}));
+</script>
 </body>
 </html>
