@@ -4,312 +4,516 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multimedia & Authoring</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
+        :root {
+            --sun: #FFD166;
+            --plasma: #EF476F;
+            --nebula: #06D6A0;
+            --void: #073B4C;
+            --deep: #020c13;
+            --star: #ffffff;
+            --dim: rgba(255,255,255,0.5);
+            --card-bg: rgba(6, 214, 160, 0.04);
+            --card-border: rgba(6, 214, 160, 0.15);
+        }
+
+        *, *::before, *::after {
+            margin: 0; padding: 0;
             box-sizing: border-box;
         }
 
+        html { scroll-behavior: smooth; }
+
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-            color: #ffffff;
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--deep);
+            color: var(--star);
             overflow-x: hidden;
+            cursor: none;
         }
 
-        /* Solar System Header */
-        .solar-system-header {
+        /* ─── CUSTOM CURSOR ─── */
+        .cursor {
+            position: fixed;
+            width: 12px; height: 12px;
+            background: var(--nebula);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s, background 0.2s;
+            mix-blend-mode: screen;
+        }
+        .cursor-trail {
+            position: fixed;
+            width: 36px; height: 36px;
+            border: 1px solid rgba(6,214,160,0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: left 0.12s ease, top 0.12s ease;
+        }
+
+        /* ─── NOISE TEXTURE OVERLAY ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.35;
+        }
+
+        /* ─── STARFIELD ─── */
+        .starfield {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .star-dot {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--dur, 4s) ease-in-out infinite;
+            animation-delay: var(--del, 0s);
+        }
+        @keyframes twinkle {
+            0%,100% { opacity: var(--op1, 0.2); transform: scale(1); }
+            50% { opacity: var(--op2, 0.8); transform: scale(1.4); }
+        }
+
+        /* ─── NAV ─── */
+        .nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 500;
+            padding: 18px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.4s;
+        }
+        .nav.solid {
+            background: rgba(2, 12, 19, 0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(6,214,160,0.1);
+        }
+        .nav-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            color: var(--nebula);
+            text-transform: uppercase;
+        }
+        .nav-links {
+            display: flex; gap: 40px; list-style: none;
+        }
+        .nav-links a {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            color: var(--dim);
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: color 0.3s;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 1px;
+            background: var(--nebula);
+            transition: width 0.3s;
+        }
+        .nav-links a:hover { color: var(--nebula); }
+        .nav-links a:hover::after { width: 100%; }
+
+        /* ─── HERO ─── */
+        .hero {
             position: relative;
             height: 100vh;
-            background: radial-gradient(circle at center, #0f0f23 0%, #000 70%);
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
         }
 
+        /* Solar System */
+        .solar-wrap {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .solar-system {
             position: relative;
-            width: 800px;
-            height: 800px;
+            width: 700px;
+            height: 700px;
         }
 
         .sun {
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 120px;
-            height: 120px;
-            background: radial-gradient(circle, #ffeb3b 0%, #ff9800 100%);
+            width: 90px; height: 90px;
             border-radius: 50%;
-            box-shadow: 0 0 50px #ffeb3b, 0 0 100px #ff9800;
-            animation: sunPulse 4s ease-in-out infinite alternate;
+            background: radial-gradient(circle at 35% 35%, #fff9c4, #FFD166 40%, #ff9800 75%, #e65100);
+            box-shadow:
+                0 0 0 6px rgba(255,209,102,0.15),
+                0 0 40px rgba(255,209,102,0.6),
+                0 0 90px rgba(255,152,0,0.4),
+                0 0 180px rgba(255,152,0,0.2);
+            animation: sunBreath 5s ease-in-out infinite alternate;
+            z-index: 5;
+        }
+        @keyframes sunBreath {
+            0% { box-shadow: 0 0 0 6px rgba(255,209,102,0.15), 0 0 40px rgba(255,209,102,0.6), 0 0 90px rgba(255,152,0,0.4), 0 0 180px rgba(255,152,0,0.2); }
+            100% { box-shadow: 0 0 0 10px rgba(255,209,102,0.1), 0 0 60px rgba(255,209,102,0.8), 0 0 120px rgba(255,152,0,0.5), 0 0 220px rgba(255,152,0,0.3); }
         }
 
-        @keyframes sunPulse {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            100% { transform: translate(-50%, -50%) scale(1.1); }
+        /* Corona rays */
+        .sun::before {
+            content: '';
+            position: absolute;
+            inset: -20px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(255,209,102,0.15) 10deg, transparent 20deg, rgba(255,209,102,0.1) 40deg, transparent 50deg, rgba(255,209,102,0.12) 70deg, transparent 80deg, rgba(255,209,102,0.08) 100deg, transparent 110deg, rgba(255,209,102,0.14) 140deg, transparent 150deg, rgba(255,209,102,0.09) 170deg, transparent 180deg, rgba(255,209,102,0.13) 210deg, transparent 220deg, rgba(255,209,102,0.11) 240deg, transparent 250deg, rgba(255,209,102,0.15) 280deg, transparent 290deg, rgba(255,209,102,0.1) 320deg, transparent 330deg, rgba(255,209,102,0.12) 350deg, transparent 360deg);
+            animation: coronaRotate 20s linear infinite;
         }
+        @keyframes coronaRotate { to { transform: rotate(360deg); } }
 
         .orbit {
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
-            animation: rotate 360s linear infinite;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .orbit::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 50%;
+            border: 1px solid transparent;
+            background: linear-gradient(90deg, rgba(6,214,160,0.2), transparent, rgba(6,214,160,0.1), transparent) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
         }
 
-        .orbit-1 { width: 200px; height: 200px; animation-duration: 20s; }
-        .orbit-2 { width: 300px; height: 300px; animation-duration: 30s; }
-        .orbit-3 { width: 400px; height: 400px; animation-duration: 40s; }
-        .orbit-4 { width: 500px; height: 500px; animation-duration: 50s; }
-        .orbit-5 { width: 600px; height: 600px; animation-duration: 60s; }
+        .orbit-container {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            animation: orbit-spin linear infinite;
+        }
+        .orbit-1-c { width: 180px; height: 180px; animation-duration: 8s; }
+        .orbit-2-c { width: 270px; height: 270px; animation-duration: 13s; }
+        .orbit-3-c { width: 360px; height: 360px; animation-duration: 20s; }
+        .orbit-4-c { width: 450px; height: 450px; animation-duration: 30s; }
+        .orbit-5-c { width: 560px; height: 560px; animation-duration: 45s; }
 
-        @keyframes rotate {
+        .orbit-ring { width: 180px; height: 180px; }
+        .orbit-ring-2 { width: 270px; height: 270px; }
+        .orbit-ring-3 { width: 360px; height: 360px; }
+        .orbit-ring-4 { width: 450px; height: 450px; }
+        .orbit-ring-5 { width: 560px; height: 560px; }
+
+        @keyframes orbit-spin {
             from { transform: translate(-50%, -50%) rotate(0deg); }
             to { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
         .planet {
             position: absolute;
+            top: 0; left: 50%;
             border-radius: 50%;
-            top: -10px;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            z-index: 10;
+            transition: box-shadow 0.3s;
+        }
+        .planet:hover { box-shadow: 0 0 20px currentColor !important; }
+
+        /* Planet derotate so label stays upright */
+        .planet-label {
+            position: absolute;
+            top: calc(100% + 8px);
             left: 50%;
             transform: translateX(-50%);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-        }
-
-        .mercury { width: 15px; height: 15px; background: #8c7853; }
-        .venus { width: 20px; height: 20px; background: #ff6b47; }
-        .earth { 
-            width: 25px; 
-            height: 25px; 
-            background: linear-gradient(45deg, #4fc3f7 0%, #29b6f6 50%, #0277bd 100%);
-        }
-        .mars { width: 18px; height: 18px; background: #d32f2f; }
-        .jupiter { width: 35px; height: 35px; background: #ff8a65; }
-
-        /* Rotoscope Effect */
-        .rotoscope-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, 
-                transparent 0%, 
-                rgba(255, 0, 150, 0.1) 25%, 
-                transparent 50%, 
-                rgba(0, 255, 255, 0.1) 75%, 
-                transparent 100%);
-            animation: rotoscope 8s linear infinite;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.55rem;
+            letter-spacing: 0.12em;
+            color: rgba(255,255,255,0.6);
+            white-space: nowrap;
+            text-transform: uppercase;
             pointer-events: none;
+            animation: orbit-spin-reverse linear infinite;
+        }
+        .orbit-1-c .planet-label { animation-duration: 8s; }
+        .orbit-2-c .planet-label { animation-duration: 13s; }
+        .orbit-3-c .planet-label { animation-duration: 20s; }
+        .orbit-4-c .planet-label { animation-duration: 30s; }
+        .orbit-5-c .planet-label { animation-duration: 45s; }
+
+        @keyframes orbit-spin-reverse {
+            from { transform: translateX(-50%) rotate(0deg); }
+            to { transform: translateX(-50%) rotate(-360deg); }
         }
 
-        @keyframes rotoscope {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        .mercury {
+            width: 12px; height: 12px;
+            background: radial-gradient(circle at 35% 35%, #d4ccc5, #8c7853);
+            box-shadow: 0 0 8px rgba(140,120,83,0.6);
+            color: #8c7853;
         }
-
-        /* Header Content */
-        .header-content {
+        .venus {
+            width: 20px; height: 20px;
+            background: radial-gradient(circle at 35% 35%, #ffe0b2, #ff9800 50%, #e65100);
+            box-shadow: 0 0 10px rgba(255,152,0,0.6);
+            color: #ff9800;
+        }
+        .earth {
+            width: 22px; height: 22px;
+            background: radial-gradient(circle at 35% 35%, #80deea, #0288d1 40%, #01579b 70%, #1a237e);
+            box-shadow: 0 0 14px rgba(2,136,209,0.7);
+            color: #0288d1;
+        }
+        .mars {
+            width: 16px; height: 16px;
+            background: radial-gradient(circle at 35% 35%, #ff8a65, #d32f2f 50%, #8b0000);
+            box-shadow: 0 0 10px rgba(211,47,47,0.6);
+            color: #d32f2f;
+        }
+        .jupiter {
+            width: 38px; height: 38px;
+            background: radial-gradient(circle at 35% 35%, #ffe0b2, #ff8a65 30%, #bf360c 60%, #4e342e);
+            box-shadow: 0 0 18px rgba(255,138,101,0.6);
+            color: #ff8a65;
+            overflow: hidden;
+        }
+        .jupiter::after {
+            content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 38%; left: 0; right: 0;
+            height: 3px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+        }
+
+        /* Hero text */
+        .hero-content {
+            position: relative;
+            z-index: 20;
             text-align: center;
-            z-index: 10;
+            padding: 0 20px;
         }
 
-        .header-content h1 {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
-            animation: titleGlow 3s ease-in-out infinite alternate;
+        .hero-eyebrow {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.4em;
+            color: var(--nebula);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeUp 0.8s 0.3s forwards;
         }
 
-        @keyframes titleGlow {
-            0% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.8); }
-            100% { text-shadow: 0 0 30px rgba(255, 255, 255, 1), 0 0 40px rgba(0, 255, 255, 0.5); }
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.2rem, 6vw, 5.5rem);
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            opacity: 0;
+            animation: fadeUp 0.8s 0.5s forwards;
+        }
+        .hero-title span {
+            display: block;
+            -webkit-text-stroke: 1px var(--nebula);
+            color: transparent;
+        }
+        .hero-title strong {
+            display: block;
+            color: var(--star);
         }
 
-        .header-content p {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
+        .hero-sub {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.3em;
+            color: var(--dim);
+            text-transform: uppercase;
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeUp 0.8s 0.7s forwards;
         }
 
-        .cta-button {
-            display: inline-block;
-            padding: 15px 40px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            color: white;
-            text-decoration: none;
-            border-radius: 30px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-        }
-
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
-        }
-
-        /* Navigation */
-        .nav-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px 50px;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            z-index: 100;
-            transition: background 0.3s ease;
-        }
-
-        .nav-bar.scrolled {
-            background: rgba(0, 0, 0, 0.8);
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
+        .hero-cta {
+            display: inline-flex;
             align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #4ecdc4;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 30px;
-        }
-
-        .nav-links a {
-            color: #ffffff;
+            gap: 12px;
+            padding: 14px 36px;
+            border: 1px solid var(--nebula);
+            color: var(--nebula);
             text-decoration: none;
-            transition: color 0.3s ease;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeUp 0.8s 0.9s forwards;
+        }
+        .hero-cta::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--nebula);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+        .hero-cta:hover::before { transform: scaleX(1); }
+        .hero-cta:hover { color: var(--deep); }
+        .hero-cta span { position: relative; z-index: 1; }
+        .hero-cta .arrow { transition: transform 0.3s; position: relative; z-index: 1; }
+        .hero-cta:hover .arrow { transform: translateX(6px); }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .nav-links a:hover {
-            color: #4ecdc4;
-        }
-
-        /* Mobile Menu */
-        .mobile-menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: #ffffff;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        .mobile-menu {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.95);
+        /* Scroll indicator */
+        .scroll-hint {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            transition: left 0.3s ease;
-            z-index: 200;
+            gap: 8px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            color: var(--dim);
+            text-transform: uppercase;
+            z-index: 20;
+            animation: fadeIn 1s 1.5s both;
+        }
+        .scroll-line {
+            width: 1px; height: 48px;
+            background: linear-gradient(to bottom, var(--nebula), transparent);
+            animation: scrollLine 2s ease-in-out infinite;
+        }
+        @keyframes scrollLine {
+            0% { transform: scaleY(0); transform-origin: top; }
+            50% { transform: scaleY(1); transform-origin: top; }
+            51% { transform: scaleY(1); transform-origin: bottom; }
+            100% { transform: scaleY(0); transform-origin: bottom; }
+        }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+        /* ─── HORIZONTAL TICKER ─── */
+        .ticker-wrap {
+            overflow: hidden;
+            background: var(--nebula);
+            padding: 12px 0;
+            position: relative;
+            z-index: 10;
+        }
+        .ticker {
+            display: flex;
+            white-space: nowrap;
+            animation: ticker 30s linear infinite;
+        }
+        .ticker-item {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.15em;
+            color: var(--deep);
+            text-transform: uppercase;
+            padding: 0 40px;
+        }
+        .ticker-item::before { content: '◆  '; }
+        @keyframes ticker {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
         }
 
-        .mobile-menu.active {
-            left: 0;
-        }
-
-        .mobile-menu a {
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 2rem;
-            margin: 20px 0;
-            transition: color 0.3s ease;
-        }
-
-        .mobile-menu a:hover {
-            color: #4ecdc4;
-        }
-
-        .mobile-menu-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: none;
-            border: none;
-            color: #ffffff;
-            font-size: 2rem;
-            cursor: pointer;
-        }
-
-        /* Main Content - Removed excessive padding */
-        .main-content {
-            padding: 50px 50px 0;
+        /* ─── SECTION SHARED ─── */
+        .section {
+            position: relative;
+            padding: 100px 60px;
             max-width: 1400px;
             margin: 0 auto;
         }
 
-        .section {
-            margin-bottom: 50px;
+        .section-tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.35em;
+            color: var(--nebula);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-tag::before {
+            content: '';
+            display: block;
+            width: 32px; height: 1px;
+            background: var(--nebula);
         }
 
-        .section h2 {
-            font-size: 3rem;
+        .section-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 700;
+            line-height: 1.1;
             margin-bottom: 20px;
-            color: #4ecdc4;
-            text-align: center;
-            background: linear-gradient(45deg, #4ecdc4, #ff6b6b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--star);
         }
 
-        .section-subtitle {
-            text-align: center;
-            font-size: 1.2rem;
-            margin-bottom: 40px;
-            opacity: 0.8;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
+        .section-heading em {
+            font-style: normal;
+            -webkit-text-stroke: 1px rgba(6,214,160,0.5);
+            color: transparent;
         }
 
-        /* Services Grid - Compact Layout */
-        .services-grid {
+        /* ─── SERVICES ─── */
+        .services-layout {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-            align-items: stretch;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+            margin-top: 60px;
+            border: 1px solid rgba(6,214,160,0.1);
         }
 
         .service-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 30px;
-            transition: all 0.3s ease;
+            background: var(--card-bg);
+            padding: 48px 44px;
+            border: 1px solid var(--card-border);
             position: relative;
             overflow: hidden;
-            height: 100%;
+            transition: background 0.4s;
             display: flex;
             flex-direction: column;
         }
@@ -317,318 +521,588 @@
         .service-card::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transform: rotate(45deg);
-            transition: all 0.5s ease;
-            opacity: 0;
+            top: 0; left: 0;
+            width: 3px; height: 0;
+            background: linear-gradient(to bottom, var(--nebula), var(--plasma));
+            transition: height 0.5s ease;
         }
 
-        .service-card:hover::before {
-            opacity: 1;
-            transform: rotate(45deg) translate(50%, 50%);
-        }
-
+        .service-card:hover::before { height: 100%; }
         .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(78, 205, 196, 0.3);
-            border-color: rgba(78, 205, 196, 0.5);
+            background: rgba(6,214,160,0.07);
         }
 
-        .service-card h3 {
-            color: #ff6b6b;
-            font-size: 1.6rem;
-            margin-bottom: 15px;
-            position: relative;
-            z-index: 1;
+        .service-num {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.2em;
+            color: var(--nebula);
+            margin-bottom: 28px;
+            opacity: 0.7;
         }
 
-        .service-card p {
-            line-height: 1.6;
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
-            flex-grow: 1;
+        .service-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .service-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--star);
+            margin-bottom: 18px;
+            line-height: 1.3;
+        }
+
+        .service-desc {
             font-size: 0.95rem;
+            line-height: 1.75;
+            color: var(--dim);
+            font-weight: 300;
+            flex-grow: 1;
         }
 
-        /* Footer - Reduced spacing */
-        .footer {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 40px 50px 30px;
+        .service-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 28px;
+        }
+        .tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border: 1px solid rgba(6,214,160,0.25);
+            color: rgba(6,214,160,0.7);
+        }
+
+        /* Wide card spans both columns */
+        .service-card.wide {
+            grid-column: 1 / -1;
+        }
+
+        /* ─── STATS BAR ─── */
+        .stats-bar {
+            background: rgba(6,214,160,0.04);
+            border-top: 1px solid rgba(6,214,160,0.1);
+            border-bottom: 1px solid rgba(6,214,160,0.1);
+            padding: 48px 60px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background-color: rgba(6,214,160,0.07);
+        }
+        .stat-cell {
+            background: var(--deep);
+            padding: 32px;
             text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: 40px;
+        }
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: var(--nebula);
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        .stat-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--dim);
         }
 
-        .footer-content {
-            max-width: 1200px;
+        /* ─── PLANET DETAILS ─── */
+        .planets-section {
+            padding: 100px 60px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
-        .footer p {
-            opacity: 0.7;
-            margin-top: 10px;
+        .planets-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2px;
+            margin-top: 60px;
+            border: 1px solid rgba(6,214,160,0.1);
         }
-
-        /* Planet Tooltip */
-        .planet-tooltip {
+        .planet-card {
+            background: rgba(255,255,255,0.02);
+            padding: 36px 24px;
+            border: 1px solid rgba(255,255,255,0.04);
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .planet-card::after {
+            content: '';
             position: absolute;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
+            bottom: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--c), transparent);
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+        .planet-card:hover::after { transform: scaleX(1); }
+        .planet-card:hover { background: rgba(255,255,255,0.04); }
+
+        .planet-orb {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        .p-mercury { background: radial-gradient(circle at 35% 35%, #d4ccc5, #8c7853); box-shadow: 0 0 20px rgba(140,120,83,0.4); --c: #8c7853; }
+        .p-venus   { background: radial-gradient(circle at 35% 35%, #ffe0b2, #ff9800 50%, #e65100); box-shadow: 0 0 20px rgba(255,152,0,0.4); --c: #ff9800; }
+        .p-earth   { background: radial-gradient(circle at 35% 35%, #80deea, #0288d1 40%, #01579b); box-shadow: 0 0 20px rgba(2,136,209,0.5); --c: #0288d1; }
+        .p-mars    { background: radial-gradient(circle at 35% 35%, #ff8a65, #d32f2f 50%, #8b0000); box-shadow: 0 0 20px rgba(211,47,47,0.4); --c: #d32f2f; }
+        .p-jupiter { background: radial-gradient(circle at 35% 35%, #ffe0b2, #ff8a65 30%, #bf360c); box-shadow: 0 0 20px rgba(255,138,101,0.4); --c: #ff8a65; }
+
+        .planet-name {
+            font-family: 'Orbitron', sans-serif;
             font-size: 0.8rem;
+            letter-spacing: 0.12em;
+            color: var(--star);
+            margin-bottom: 8px;
+        }
+        .planet-info {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.62rem;
+            color: var(--dim);
+            line-height: 1.6;
+        }
+
+        /* ─── FOOTER ─── */
+        .footer {
+            border-top: 1px solid rgba(6,214,160,0.12);
+            padding: 60px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+        .footer-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.25em;
+            color: var(--nebula);
+        }
+        .footer-credits {
+            text-align: center;
+        }
+        .footer-credits p {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            color: var(--dim);
+            line-height: 2;
+        }
+        .footer-copy {
+            text-align: right;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.62rem;
+            color: rgba(255,255,255,0.25);
+            letter-spacing: 0.1em;
+        }
+
+        /* ─── SCANLINE ─── */
+        .scanline {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 50;
+            z-index: 999;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 3px,
+                rgba(0,0,0,0.03) 3px,
+                rgba(0,0,0,0.03) 4px
+            );
         }
 
-        .planet-tooltip.visible {
-            opacity: 1;
+        /* ─── CORNER DECORATION ─── */
+        .corner-deco {
+            position: absolute;
+            width: 24px; height: 24px;
+            opacity: 0.4;
+        }
+        .corner-deco.tl { top: 24px; left: 24px; border-top: 1px solid var(--nebula); border-left: 1px solid var(--nebula); }
+        .corner-deco.tr { top: 24px; right: 24px; border-top: 1px solid var(--nebula); border-right: 1px solid var(--nebula); }
+        .corner-deco.bl { bottom: 24px; left: 24px; border-bottom: 1px solid var(--nebula); border-left: 1px solid var(--nebula); }
+        .corner-deco.br { bottom: 24px; right: 24px; border-bottom: 1px solid var(--nebula); border-right: 1px solid var(--nebula); }
+
+        /* ─── MOBILE ─── */
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .mobile-toggle span {
+            display: block;
+            width: 24px; height: 1px;
+            background: var(--star);
+            transition: all 0.3s;
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .nav-bar {
-                padding: 15px 20px;
-            }
-            
-            .nav-links {
-                display: none;
-            }
-            
-            .mobile-menu-toggle {
-                display: block;
-            }
-            
-            .header-content h1 {
-                font-size: 2.5rem;
-            }
-            
-            .header-content p {
-                font-size: 1.2rem;
-            }
-            
-            .main-content {
-                padding: 30px 20px 0;
-            }
-            
-            .solar-system {
-                width: 400px;
-                height: 400px;
-            }
-            
-            .orbit-1 { width: 100px; height: 100px; }
-            .orbit-2 { width: 150px; height: 150px; }
-            .orbit-3 { width: 200px; height: 200px; }
-            .orbit-4 { width: 250px; height: 250px; }
-            .orbit-5 { width: 300px; height: 300px; }
-
-            .section h2 {
-                font-size: 2.5rem;
-            }
-
-            .services-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .service-card {
-                padding: 25px;
-            }
-
-            .section {
-                margin-bottom: 30px;
-            }
-
-            .footer {
-                padding: 30px 20px 20px;
-                margin-top: 30px;
-            }
+        @media (max-width: 900px) {
+            .nav-links { display: none; }
+            .mobile-toggle { display: flex; }
+            .hero-title { font-size: 2.4rem; }
+            .services-layout { grid-template-columns: 1fr; }
+            .service-card.wide { grid-column: 1; }
+            .stats-bar { grid-template-columns: 1fr 1fr; }
+            .planets-grid { grid-template-columns: repeat(3, 1fr); }
+            .footer { grid-template-columns: 1fr; text-align: center; }
+            .footer-copy { text-align: center; }
+            .section { padding: 60px 24px; }
+            .solar-system { width: 360px; height: 360px; }
+            .orbit-1-c { width: 96px; height: 96px; }
+            .orbit-2-c { width: 144px; height: 144px; }
+            .orbit-3-c { width: 192px; height: 192px; }
+            .orbit-4-c { width: 240px; height: 240px; }
+            .orbit-5-c { width: 300px; height: 300px; }
+            .orbit-ring { width: 96px; height: 96px; }
+            .orbit-ring-2 { width: 144px; height: 144px; }
+            .orbit-ring-3 { width: 192px; height: 192px; }
+            .orbit-ring-4 { width: 240px; height: 240px; }
+            .orbit-ring-5 { width: 300px; height: 300px; }
         }
-
-        @media (max-width: 480px) {
-            .header-content h1 {
-                font-size: 2rem;
-            }
-            
-            .header-content p {
-                font-size: 1rem;
-            }
-            
-            .solar-system {
-                width: 300px;
-                height: 300px;
-            }
-            
-            .orbit-1 { width: 80px; height: 80px; }
-            .orbit-2 { width: 120px; height: 120px; }
-            .orbit-3 { width: 160px; height: 160px; }
-            .orbit-4 { width: 200px; height: 200px; }
-            .orbit-5 { width: 240px; height: 240px; }
-
-            .services-grid {
-                gap: 15px;
-            }
-
-            .service-card {
-                padding: 20px;
-            }
-
-            .main-content {
-                padding: 20px 15px 0;
-            }
+        @media (max-width: 560px) {
+            .planets-grid { grid-template-columns: 1fr 1fr; }
+            .stats-bar { grid-template-columns: 1fr; padding: 24px; }
+            .solar-system { width: 280px; height: 280px; }
+            .orbit-1-c { width: 72px; height: 72px; }
+            .orbit-2-c { width: 108px; height: 108px; }
+            .orbit-3-c { width: 148px; height: 148px; }
+            .orbit-4-c { width: 192px; height: 192px; }
+            .orbit-5-c { width: 240px; height: 240px; }
+            .orbit-ring { width: 72px; height: 72px; }
+            .orbit-ring-2 { width: 108px; height: 108px; }
+            .orbit-ring-3 { width: 148px; height: 148px; }
+            .orbit-ring-4 { width: 192px; height: 192px; }
+            .orbit-ring-5 { width: 240px; height: 240px; }
+            .planet-label { display: none; }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="nav-bar" id="navbar">
-        <div class="nav-container">
-            <div class="logo">Multimedia and Authoring</div>
-            <ul class="nav-links">
-                <li><a href="rotoscope.html">Rotoscope</a></li>
-                <li><a href="solarsystem.html">Solar System</a></li>
-            </ul>
-            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
-        </div>
-    </nav>
 
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-        <button class="mobile-menu-close" onclick="toggleMobileMenu()">×</button>
-        <a href="home.html" onclick="toggleMobileMenu()">Home</a>
-        <a href="rotoscope.html" onclick="toggleMobileMenu()">Rotoscope</a>
-        <a href="solarsystem.html" onclick="toggleMobileMenu()">Solar System</a>
-    </div>
+<div class="scanline"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-trail" id="cursorTrail"></div>
 
-    <!-- Solar System Header -->
-    <header class="solar-system-header" id="home">
+<!-- Starfield -->
+<div class="starfield" id="starfield"></div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+    <div class="nav-logo">M &amp; A</div>
+    <ul class="nav-links">
+        <li><a href="#services">Services</a></li>
+        <li><a href="rotoscope.html">Rotoscope</a></li>
+        <li><a href="solarsystem.html">Solar System</a></li>
+    </ul>
+    <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+    </button>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="home">
+    <div class="solar-wrap">
         <div class="solar-system">
             <div class="sun"></div>
-            
-            <div class="orbit orbit-1">
-                <div class="planet mercury" data-planet="Mercury"></div>
-            </div>
-            
-            <div class="orbit orbit-2">
-                <div class="planet venus" data-planet="Venus"></div>
-            </div>
-            
-            <div class="orbit orbit-3">
-                <div class="planet earth" data-planet="Earth"></div>
-            </div>
-            
-            <div class="orbit orbit-4">
-                <div class="planet mars" data-planet="Mars"></div>
-            </div>
-            
-            <div class="orbit orbit-5">
-                <div class="planet jupiter" data-planet="Jupiter"></div>
-            </div>
-        </div>
-        
-        <div class="rotoscope-overlay"></div>
-        
-        <div class="header-content">
-            <h1>MULTIMEDIA AND AUTHORING</h1>
-            <p> DION O. ONGARIA | BSIT-NS-2A-T</p>
-            <a href="#services" class="cta-button">Explore Our Universe</a>
-        </div>
-    </header>
 
-    <!-- Planet Tooltip -->
-    <div class="planet-tooltip" id="planetTooltip"></div>
+            <!-- Orbit rings -->
+            <div class="orbit orbit-ring"></div>
+            <div class="orbit orbit-ring-2"></div>
+            <div class="orbit orbit-ring-3"></div>
+            <div class="orbit orbit-ring-4"></div>
+            <div class="orbit orbit-ring-5"></div>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Services Section -->
-        <section class="section" id="services">
-            <h2>Our Services</h2>
-            <p class="section-subtitle">Cutting-edge multimedia solutions powered by advanced technology and creative expertise</p>
-            <div class="services-grid">
-
-                <div class="service-card">
-                    <h3>🎨 3D Rendering Services</h3>
-                    <p><strong>High-Quality Visualization:</strong> Professional 3D rendering services using industry-standard software like Blender, Maya, and Cinema 4D. We create photorealistic visualizations, architectural renderings, product demonstrations, and cinematic sequences with advanced lighting and materials. Our portfolio includes commercial projects, artistic visualizations, and technical demonstrations.</p>
-                </div>
-
-                <div class="service-card">
-                    <h3>🎞️ Adobe After Effects</h3>
-                    <p><strong>Motion Graphics & Visual Effects:</strong> Professional motion graphics and visual effects creation using Adobe After Effects. We specialize in creating stunning animations, kinetic typography, particle effects, and complex compositing work. Our After Effects services include title sequences, logo animations, promotional videos, and advanced visual effects for film and digital media production.</p>
-                </div>
-
-                <div class="service-card">
-                    <h3>🔮 Blender v4.4</h3>
-                    <p><strong>Next-Generation 3D Creation:</strong> Leveraging the latest Blender v4.4 features for cutting-edge 3D modeling, animation, and rendering. We utilize advanced geometry nodes, improved cycles rendering, and enhanced sculpting tools to create photorealistic 3D content. Our Blender expertise includes character modeling, environment design, product visualization, and architectural rendering with the newest workflow improvements.</p>
+            <!-- Animated orbit containers -->
+            <div class="orbit-container orbit-1-c">
+                <div class="planet mercury">
+                    <div class="planet-label">Mercury</div>
                 </div>
             </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <p>&copy; 2025 Multimedia and Authoring. | Jerome Steven Rosario | BSIT-S-2A-T</p>
+            <div class="orbit-container orbit-2-c">
+                <div class="planet venus">
+                    <div class="planet-label">Venus</div>
+                </div>
+            </div>
+            <div class="orbit-container orbit-3-c">
+                <div class="planet earth">
+                    <div class="planet-label">Earth</div>
+                </div>
+            </div>
+            <div class="orbit-container orbit-4-c">
+                <div class="planet mars">
+                    <div class="planet-label">Mars</div>
+                </div>
+            </div>
+            <div class="orbit-container orbit-5-c">
+                <div class="planet jupiter">
+                    <div class="planet-label">Jupiter</div>
+                </div>
+            </div>
         </div>
-    </footer>
+    </div>
 
-    <script>
-        // Mobile menu toggle
-        function toggleMobileMenu() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            mobileMenu.classList.toggle('active');
-        }
+    <!-- Corner decorations -->
+    <div class="corner-deco tl"></div>
+    <div class="corner-deco tr"></div>
+    <div class="corner-deco bl"></div>
+    <div class="corner-deco br"></div>
 
-        // Navbar scroll effect
-        window.addEventListener('scroll', function() {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 100) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
+    <div class="hero-content">
+        <p class="hero-eyebrow">Multimedia &amp; Authoring</p>
+        <h1 class="hero-title">
+            <span>EXPLORE</span>
+            <strong>THE UNIVERSE</strong>
+        </h1>
+        <p class="hero-sub">Dion O. Ongaria &nbsp;·&nbsp; BSIT-NS-2A-T</p>
+        <a href="#services" class="hero-cta">
+            <span>Discover Our Work</span>
+            <span class="arrow">→</span>
+        </a>
+    </div>
 
-        // Planet tooltip
-        const planets = document.querySelectorAll('.planet');
-        const tooltip = document.getElementById('planetTooltip');
+    <div class="scroll-hint">
+        <span>Scroll</span>
+        <div class="scroll-line"></div>
+    </div>
+</header>
 
-        planets.forEach(planet => {
-            planet.addEventListener('mouseenter', function(e) {
-                const planetName = e.target.getAttribute('data-planet');
-                tooltip.textContent = planetName;
-                tooltip.classList.add('visible');
-            });
+<!-- TICKER -->
+<div class="ticker-wrap" aria-hidden="true">
+    <div class="ticker">
+        <span class="ticker-item">3D Rendering</span>
+        <span class="ticker-item">Motion Graphics</span>
+        <span class="ticker-item">Visual Effects</span>
+        <span class="ticker-item">After Effects</span>
+        <span class="ticker-item">Blender v4.4</span>
+        <span class="ticker-item">3D Modeling</span>
+        <span class="ticker-item">Animation</span>
+        <span class="ticker-item">Compositing</span>
+        <span class="ticker-item">3D Rendering</span>
+        <span class="ticker-item">Motion Graphics</span>
+        <span class="ticker-item">Visual Effects</span>
+        <span class="ticker-item">After Effects</span>
+        <span class="ticker-item">Blender v4.4</span>
+        <span class="ticker-item">3D Modeling</span>
+        <span class="ticker-item">Animation</span>
+        <span class="ticker-item">Compositing</span>
+    </div>
+</div>
 
-            planet.addEventListener('mousemove', function(e) {
-                tooltip.style.left = e.pageX + 10 + 'px';
-                tooltip.style.top = e.pageY - 30 + 'px';
-            });
+<!-- SERVICES -->
+<main>
+    <section class="section" id="services">
+        <p class="section-tag">Our Capabilities</p>
+        <h2 class="section-heading">What We <em>Create</em></h2>
+        <p style="color: var(--dim); font-size:1rem; max-width: 600px; line-height: 1.8; font-weight:300;">
+            Cutting-edge multimedia solutions crafted at the intersection of technology and creative vision.
+        </p>
 
-            planet.addEventListener('mouseleave', function() {
-                tooltip.classList.remove('visible');
-            });
-        });
+        <div class="services-layout">
 
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-    </script>
+            <div class="service-card">
+                <div class="service-num">01 / 03</div>
+                <span class="service-icon">🎨</span>
+                <h3 class="service-title">3D Rendering Services</h3>
+                <p class="service-desc">Professional 3D rendering using industry-standard pipelines — Blender, Maya, and Cinema 4D. We produce photorealistic visualizations, architectural renderings, product demonstrations, and cinematic sequences with advanced physically-based lighting and materials.</p>
+                <div class="service-tags">
+                    <span class="tag">Blender</span>
+                    <span class="tag">Maya</span>
+                    <span class="tag">Cinema 4D</span>
+                    <span class="tag">PBR</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-num">02 / 03</div>
+                <span class="service-icon">🎞️</span>
+                <h3 class="service-title">Adobe After Effects</h3>
+                <p class="service-desc">Motion graphics and visual effects creation at a professional level. We specialize in kinetic typography, particle systems, complex compositing, title sequences, logo animations, and advanced VFX for film and digital media production.</p>
+                <div class="service-tags">
+                    <span class="tag">After Effects</span>
+                    <span class="tag">Compositing</span>
+                    <span class="tag">Motion</span>
+                    <span class="tag">VFX</span>
+                </div>
+            </div>
+
+            <div class="service-card wide">
+                <div class="service-num">03 / 03</div>
+                <span class="service-icon">🔮</span>
+                <h3 class="service-title">Blender v4.4 — Next-Generation 3D</h3>
+                <p class="service-desc">Leveraging the latest Blender v4.4 features for cutting-edge 3D modeling, animation, and rendering. Advanced geometry nodes, improved Cycles rendering, and enhanced sculpting tools produce photorealistic content. Our expertise spans character modeling, environment design, product visualization, and architectural rendering — all harnessing the newest workflow improvements in the v4.4 release.</p>
+                <div class="service-tags">
+                    <span class="tag">Geometry Nodes</span>
+                    <span class="tag">Cycles X</span>
+                    <span class="tag">Sculpting</span>
+                    <span class="tag">EEVEE Next</span>
+                    <span class="tag">Rigging</span>
+                    <span class="tag">Shading</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <div class="stats-bar">
+        <div class="stat-cell">
+            <div class="stat-value" data-target="5">0</div>
+            <div class="stat-label">Planets Modeled</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-value" data-target="3">0</div>
+            <div class="stat-label">Core Services</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-value" data-target="4">0</div>
+            <div class="stat-label">Software Suites</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-value" data-suffix=".4">v4</div>
+            <div class="stat-label">Blender Version</div>
+        </div>
+    </div>
+
+    <!-- PLANETS -->
+    <section class="planets-section" id="planets">
+        <p class="section-tag">The Solar System</p>
+        <h2 class="section-heading">Our <em>Cosmic</em> Models</h2>
+
+        <div class="planets-grid">
+            <div class="planet-card" style="--c: #8c7853;">
+                <div class="planet-orb p-mercury"></div>
+                <div class="planet-name">Mercury</div>
+                <div class="planet-info">Orbit: 88 days<br>Distance: 0.39 AU</div>
+            </div>
+            <div class="planet-card" style="--c: #ff9800;">
+                <div class="planet-orb p-venus"></div>
+                <div class="planet-name">Venus</div>
+                <div class="planet-info">Orbit: 225 days<br>Distance: 0.72 AU</div>
+            </div>
+            <div class="planet-card" style="--c: #0288d1;">
+                <div class="planet-orb p-earth"></div>
+                <div class="planet-name">Earth</div>
+                <div class="planet-info">Orbit: 365 days<br>Distance: 1.00 AU</div>
+            </div>
+            <div class="planet-card" style="--c: #d32f2f;">
+                <div class="planet-orb p-mars"></div>
+                <div class="planet-name">Mars</div>
+                <div class="planet-info">Orbit: 687 days<br>Distance: 1.52 AU</div>
+            </div>
+            <div class="planet-card" style="--c: #ff8a65;">
+                <div class="planet-orb p-jupiter"></div>
+                <div class="planet-name">Jupiter</div>
+                <div class="planet-info">Orbit: 12 years<br>Distance: 5.20 AU</div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-logo">Multimedia &amp;<br>Authoring</div>
+    <div class="footer-credits">
+        <p>Dion O. Ongaria</p>
+        <p>BSIT-NS-2A-T</p>
+        <p style="margin-top:8px; color: rgba(255,255,255,0.2);">——————</p>
+        <p>Jerome Steven Rosario</p>
+        <p>BSIT-S-2A-T</p>
+    </div>
+    <div class="footer-copy">
+        &copy; 2025<br>All Rights Reserved
+    </div>
+</footer>
+
+<script>
+/* ─── STARFIELD ─── */
+const sf = document.getElementById('starfield');
+for (let i = 0; i < 180; i++) {
+    const s = document.createElement('div');
+    s.className = 'star-dot';
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `
+        width:${size}px; height:${size}px;
+        top:${Math.random()*100}%;
+        left:${Math.random()*100}%;
+        --dur:${Math.random()*5+3}s;
+        --del:${Math.random()*6}s;
+        --op1:${Math.random()*0.3+0.05};
+        --op2:${Math.random()*0.7+0.3};
+    `;
+    sf.appendChild(s);
+}
+
+/* ─── CURSOR ─── */
+const cursor = document.getElementById('cursor');
+const trail = document.getElementById('cursorTrail');
+document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+    trail.style.left = e.clientX + 'px';
+    trail.style.top = e.clientY + 'px';
+});
+
+/* ─── NAV SCROLL ─── */
+window.addEventListener('scroll', () => {
+    document.getElementById('nav').classList.toggle('solid', window.scrollY > 80);
+});
+
+/* ─── COUNTER ANIMATION ─── */
+const counters = document.querySelectorAll('[data-target]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = parseInt(el.dataset.target);
+        let current = 0;
+        const step = target / 40;
+        const timer = setInterval(() => {
+            current += step;
+            if (current >= target) { current = target; clearInterval(timer); }
+            el.textContent = Math.floor(current);
+        }, 40);
+        observer.unobserve(el);
+    });
+}, { threshold: 0.5 });
+counters.forEach(c => observer.observe(c));
+
+/* ─── SMOOTH SCROLL ─── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+        e.preventDefault();
+        const t = document.querySelector(a.getAttribute('href'));
+        if (t) t.scrollIntoView({ behavior: 'smooth' });
+    });
+});
+
+/* ─── MOBILE MENU PLACEHOLDER ─── */
+document.getElementById('mobileToggle').addEventListener('click', () => {
+    const links = document.querySelector('.nav-links');
+    if (!links.style.display || links.style.display === 'none') {
+        links.style.cssText = 'display:flex; flex-direction:column; position:fixed; top:64px; left:0; right:0; background:rgba(2,12,19,0.97); padding:24px; gap:24px; z-index:499; border-bottom:1px solid rgba(6,214,160,0.15);';
+    } else {
+        links.style.display = 'none';
+    }
+});
+</script>
 </body>
 </html>
