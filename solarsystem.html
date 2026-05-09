@@ -537,7 +537,7 @@ function animateVal(el,target){
 document.getElementById('earthAge').addEventListener('keydown',e=>{if(e.key==='Enter')calculatePlanetAges();});
 
 /* ── DOWNLOAD ── */
-const blendMap={mercury:'mercury.blend',venus:'venus.blend',earth:'earth.blend',mars:'mars.blend',jupiter:'jupiter.blend',saturn:'saturn.blend',uranus:'uranus.blend',neptune:'neptune.blend',pluto:'pluto.blend',solarsystem:'ONGARIA-SOLAR_SYSTEM.blend'};
+const blendMap={mercury:'mercury.blend',venus:'venus.blend',earth:'earth.blend',mars:'mars.blend',jupiter:'jupiter.blend',saturn:'saturn.blend',uranus:'uranus.blend',neptune:'neptune.blend',pluto:'pluto.blend',solarsystem:'ongaria_solarsystem.blend'};
 function downloadBlendFile(p){
     const f=blendMap[p]; if(!f)return;
     const a=document.createElement('a'); a.href='blender_files/'+f; a.download=f;
