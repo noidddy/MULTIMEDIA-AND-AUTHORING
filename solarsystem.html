@@ -513,29 +513,6 @@ function playVid(id){
     vid.addEventListener('ended',()=>{vid.style.display='none'; ph.style.display='flex';},{once:true});
 }
 
-/* ── AGE CALCULATOR ── */
-const periods = { mercury:.24,venus:.62,earth:1,mars:1.88,jupiter:11.86,saturn:29.46,uranus:84.01,neptune:164.8,pluto:248.6 };
-function calculatePlanetAges(){
-    const age=parseFloat(document.getElementById('earthAge').value);
-    if(isNaN(age)||age<=0){ alert('Please enter a valid age.'); return; }
-    for(const [planet,period] of Object.entries(periods)){
-        const a=(age/period).toFixed(2);
-        const s=document.getElementById('ag-'+planet);
-        if(s) animateVal(s,a);
-        const r=document.getElementById('pr-'+planet);
-        if(r) r.textContent=a+' yrs';
-    }
-}
-function animateVal(el,target){
-    const t=parseFloat(target); let c=0;
-    const step=t/30;
-    const tm=setInterval(()=>{
-        c+=step; if(c>=t){c=t;clearInterval(tm);}
-        el.textContent=c.toFixed(2);
-    },30);
-}
-document.getElementById('earthAge').addEventListener('keydown',e=>{if(e.key==='Enter')calculatePlanetAges();});
-
 /* ── DOWNLOAD ── */
 const blendMap={mercury:'mercury.blend',venus:'venus.blend',earth:'earth.blend',mars:'mars.blend',jupiter:'jupiter.blend',saturn:'saturn.blend',uranus:'uranus.blend',neptune:'neptune.blend',pluto:'pluto.blend',solarsystem:'ongaria_solarsystem.blend'};
 function downloadBlendFile(p){
@@ -547,5 +524,8 @@ function downloadBlendFile(p){
 /* ── SMOOTH SCROLL ── */
 document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});}));
 </script>
+
+<!-- AGE CALCULATOR JS (separate file) -->
+<script src="solarsystem-age-calculator.js"></script>
 </body>
 </html>
