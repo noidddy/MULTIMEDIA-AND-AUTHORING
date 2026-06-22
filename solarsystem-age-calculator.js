@@ -1,7 +1,7 @@
 /* ── AGE CALCULATOR ── */
-var periods = { mercury:0.24, venus:0.62, earth:1, mars:1.88, jupiter:11.86, saturn:29.46, uranus:84.01, neptune:164.8, pluto:248.6 };
+var periods = { mercury: 0.24, venus: 0.62, earth: 1, mars: 1.88, jupiter: 11.86, saturn: 29.46, uranus: 84.01, neptune: 164.8, pluto: 248.6 };
 
-function calculatePlanetAges(){
+function calculatePlanetAges() {
     var earthAgeInput = document.getElementById('earthAge');
     var age = parseFloat(earthAgeInput && earthAgeInput.value);
     var planet;
@@ -23,18 +23,19 @@ function calculatePlanetAges(){
     }
 }
 
-function animateVal(el, target){
+function animateVal(el, target) {
     var t = parseFloat(target);
     var c = 0;
     var step = t / 30;
-    var tm = setInterval(function(){
+    var tm = setInterval(function() {
         c += step;
-        if (c >= t) { c = t; clearInterval(tm); }
+        if (c >= t) { c = t;
+            clearInterval(tm); }
         el.textContent = c.toFixed(2);
     }, 30);
 }
 
 var earthAgeInput = document.getElementById('earthAge');
 if (earthAgeInput) {
-    earthAgeInput.addEventListener('keydown', function(e){ if (e.key === 'Enter') calculatePlanetAges(); });
+    earthAgeInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') calculatePlanetAges(); });
 }
